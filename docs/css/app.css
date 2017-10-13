@@ -1,0 +1,112 @@
+body {
+  padding-top: 3rem;
+  padding-bottom: 1.5rem;
+}
+
+.container {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+h1 {
+  margin-bottom: 1rem;
+}
+
+h3 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mono {
+  font-family: monospace, monospace;
+  font-size: 1.0rem;
+}
+
+.text-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/******************************************************************************/
+
+.description {
+  font-weight: 300;
+  font-size: 1.2rem;
+}
+
+/******************************************************************************/
+
+#trade-list {
+  font-size: 0.8rem;
+}
+
+#trade-list .mono {
+  font-size: 0.8rem;
+}
+
+#trade-list .overflow {
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#trade-list .overflow-sm {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#fetch-button {
+  font-size: 1.0rem;
+}
+
+/******************************************************************************/
+
+canvas {
+  max-width: 33%;
+  display: block;
+}
+
+/******************************************************************************/
+
+.footer {
+  bottom: 0;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.footer span {
+  font-size: 0.9rem;
+}
+
+/******************************************************************************/
+
+#status-bar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  line-height: 1.5rem;
+  background-color: #222;
+  z-index: 3;
+}
+
+#status-bar table {
+  table-layout: fixed;
+  font-size: 0.8rem;
+  color: white;
+  width: 100%;
+}
+
+#status-bar table td {
+  width: 50%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#status-bar a {
+  color: inherit;
+}

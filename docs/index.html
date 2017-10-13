@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/fontello-embedded.css" rel="stylesheet">
+    <link href="css/app.css" rel="stylesheet">
+  </head>
+  <body>
+  <div class="container">
+    <div class="row">
+      <h1>0x Trade Viewer</h1>
+    </div>
+    <div class="row">
+      <p class="description">A real-time trade viewer for the <a href="https://0xproject.com/" target="_blank">0x protocol</a>.</p>
+      <p class="description">Note: this web app is beta software and currently works best with a browser wallet, like <a href="https://metamask.io/" target="_blank">MetaMask</a>, <a href="https://parity.io/parity.html" target="_blank">Parity</a>, or <a href="https://github.com/ethereum/mist" target="_blank">Mist</a>.</p>
+    </div>
+
+    <div class="row">
+      <h3>Traded Volume (24 hr)</h3>
+    </div>
+    <div id="volume" class="row">
+      <table class="table table-condensed table-sm borderless">
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row">
+      <h3>Recent Trades</h3>
+    </div>
+    <div id="trade-list">
+      <table class="table table-condensed table-sm borderless">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Txid</th>
+            <th>Trade</th>
+            <th>Price (M:T)</th>
+            <th>Relay</th>
+            <th>Maker Fee</th>
+            <th>Taker Fee</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div class="row">
+        <div class="text-center">
+          <button id="fetch-button" type="button" class="btn btn-sm btn-info" disabled>Fetch more...</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <h3>Popular Token Trades (24 hr)</h3>
+    </div>
+    <div class="row">
+      <canvas class="text-center" id="tokens-chart" width="400" height="400"></canvas>
+    </div>
+
+    <div class="row">
+      <h3>Relay Fee Distribution (24 hr)</h3>
+    </div>
+    <div class="row">
+      <canvas class="text-center" id="relay-fee-chart" width="400" height="400"></canvas>
+    </div>
+
+    <div class="row">
+      <h3>Fee vs. Feeless Distribution (24 hr)</h3>
+    </div>
+    <div class="row">
+      <canvas class="text-center" id="fee-chart" width="400" height="400"></canvas>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <span class="text-muted">© Vanya A. Sergeev, 2017 — <a href="https://sergeev.io/">projects</a>, <a href="https://github.com/vsergeev">github</a></a>
+    </div>
+    <div class="container text-center">
+      <span class="text-muted">Tips: 0xeb914bf040515DE4FDf094B2B57FDff7b015E820</span>
+    </div>
+  </footer>
+
+  <div id="result-modal" class="modal fade">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"></h5>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="status-bar">
+    <div class="container">
+      <table>
+        <tr>
+          <td id="status-bar-network"><i class="icon-globe"></i> </td>
+          <td id="status-bar-github"><i class="icon-github-circled"></i> <b class="text-info"><a href="https://github.com/vsergeev/0xtrades.info" target="_blank">GitHub<i class="icon-link-ext"></i></a></b></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/web3.min.js"></script>
+  <script src="js/ZeroClientProvider.min.js"></script>
+  <script src="js/0x.min.js"></script>
+  <script src="js/Chart.min.js"></script>
+  <script src="js/app.js"></script>
+  </body>
+</html>
