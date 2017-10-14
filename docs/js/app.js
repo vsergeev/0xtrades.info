@@ -477,7 +477,7 @@ View.prototype = {
     var tokensVolumeChartConfig = {
       type: 'pie', options: {responsive: true}, data: { datasets: [{ backgroundColor: chartColors }] }
     };
-    this._tokensVolumeChart = new Chart($("#tokens-volume-chart")[0].getContext('2d'), tokensChartConfig);
+    this._tokensVolumeChart = new Chart($("#tokens-volume-chart")[0].getContext('2d'), tokensVolumeChartConfig);
 
     for (var key in CURRENCY_MAP) {
       var text = CURRENCY_MAP[key].symbol + " " + key;
