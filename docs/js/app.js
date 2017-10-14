@@ -656,7 +656,7 @@ View.prototype = {
     var minutes = (datetime.getUTCMinutes() < 10) ? ("0" + datetime.getUTCMinutes()) : datetime.getUTCMinutes();
     var seconds = (datetime.getUTCSeconds() < 10) ? ("0" + datetime.getUTCSeconds()) : datetime.getUTCSeconds();
 
-    return year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds + " UTC";
+    return year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
   },
 
   formatHex: function (hex, digits) {
