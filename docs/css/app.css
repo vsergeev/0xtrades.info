@@ -121,3 +121,15 @@ canvas {
 #status-bar a {
   color: #62AEFC;
 }
+
+.currency-picker {
+  margin: 1rem 0 1rem auto;
+}
+
+#currency-dropdown-list {
+  min-width: 0;
+}
+
+#currency-dropdown-list li {
+  padding: 0 15px 0 10px;
+}
