@@ -94,6 +94,7 @@ var Model = function (web3) {
   /* Price state */
   this._zrxPrice = null;
   this._fiatCurrency = "USD";
+  this._fiatSymbol = "$";
 
   /* Callbacks */
   this.connectedCallback = null;
@@ -285,6 +286,7 @@ Model.prototype = {
     if (this._zrxPrice != null) {
       feeStats.totalFeesFiat = feeStats.totalFees.mul(this._zrxPrice);
       feeStats.fiatCurrency = this._fiatCurrency;
+      feeStats.fiatSymbol = this._fiatSymbol;
     } else {
       feeStats.totalFeesFiat = null;
     }
@@ -497,7 +499,7 @@ View.prototype = {
     /* ZRX Fees */
     var fees_text = feeStats.totalFees.toFixed(6);
     if (feeStats.totalFeesFiat)
-      fees_text += " (" + feeStats.totalFeesFiat.toFixed(2) + " " + feeStats.fiatCurrency + ")";
+      fees_text += " (" + feeStats.fiatSymbol + feeStats.totalFeesFiat.toFixed(2) + " " + feeStats.fiatCurrency + ")";
 
     var elem = $('<tr></tr>')
                  .append($('<th></th>')
