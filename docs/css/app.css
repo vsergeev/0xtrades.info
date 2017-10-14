@@ -65,6 +65,10 @@ h3 {
     white-space: nowrap;
 }
 
+#price-invert {
+  cursor: pointer;
+}
+
 #fetch-button {
   font-size: 1.0rem;
 }
