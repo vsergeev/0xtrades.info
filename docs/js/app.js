@@ -283,6 +283,7 @@ Model.prototype = {
       volumeStats.totalTrades += 1;
     }
 
+    /* Compute relay fees in fiat currency, if available */
     if (this._zrxPrice != null) {
       feeStats.totalFeesFiat = feeStats.totalFees.mul(this._zrxPrice);
       feeStats.fiatCurrency = this._fiatCurrency;
@@ -294,7 +295,7 @@ Model.prototype = {
     this.statisticsUpdatedCallback(feeStats, volumeStats);
   },
 
-  /* Price update */
+  /* ZRX Price update */
 
   updateZrxPrice: function () {
     Logger.log('[Model] Fetching ZRX price');
@@ -444,6 +445,7 @@ View.prototype = {
     var makerToken = this.formatTokenLink(trade.makerToken);
     var takerToken = this.formatTokenLink(trade.takerToken);
 
+    /* Format trade string */
     var swap = $("<span></span>")
                 .append($("<span></span>").text(makerQuantity + " "))
                 .append(makerToken)
@@ -458,6 +460,7 @@ View.prototype = {
       price = price.toDigits(6);
     }
 
+    /* Format maker and taker fees */
     var makerFee = normalizeTokenQuantity(ZEROEX_TOKEN_ADDRESS, trade.paidMakerFee).toDigits(6) + " ZRX";
     var takerFee = normalizeTokenQuantity(ZEROEX_TOKEN_ADDRESS, trade.paidTakerFee).toDigits(6) + " ZRX";
 
@@ -493,6 +496,7 @@ View.prototype = {
     Logger.log(feeStats);
     Logger.log(volumeStats);
 
+    /* Clear current volumes */
     $('#volume').find("tr").remove();
 
     /* ZRX Fees */
@@ -553,7 +557,6 @@ View.prototype = {
     this._feeChart.data.labels = ["Fees", "Feeless"];
     this._feeChart.data.datasets[0].data = [feeStats.feeCount, feeStats.feelessCount];
     this._feeChart.update();
-
   },
 
   /* Button handler */
@@ -672,15 +675,15 @@ var Controller = function (model, view) {
 
 Controller.prototype = {
   init: function () {
-    ///* Bind model -> view */
+    /* Bind model -> view */
     this.model.connectedCallback = this.view.handleConnectedEvent.bind(this.view);
     this.model.newTradeCallback = this.view.handleNewTradeEvent.bind(this.view);
     this.model.statisticsUpdatedCallback = this.view.handleStatisticsUpdatedEvent.bind(this.view);
 
-    ///* Bind view -> model */
+    /* Bind view -> model */
     this.view.fetchMoreCallback = this.model.fetchPastTrades.bind(this.model);
 
-    ///* Initialize view */
+    /* Initialize view */
     this.view.init();
 
     /* Initialize model */
