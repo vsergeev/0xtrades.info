@@ -420,7 +420,7 @@ View.prototype = {
           .addClass('text-info')
           .text(networkName));
 
-      this.showResultModal(false, "Unsupported network", "This network is unsupported.<br><br>Please switch to mainnet or Kovan.");
+      this.showResultModal(false, "Unsupported network", "This network is unsupported.<br><br>Please switch to Mainnet or Kovan.");
     }
   },
 
