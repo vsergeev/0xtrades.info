@@ -60,8 +60,8 @@ var NETWORK_BLOCK_EXPLORER = {
   42: "https://kovan.etherscan.io",
 };
 
-var PRICE_API_URL = function (symbol, base) {
-  return "https://min-api.cryptocompare.com/data/price?fsym=" + symbol + "&tsyms=" + base;
+var PRICE_API_URL = function (symbols, base) {
+  return "https://min-api.cryptocompare.com/data/pricemulti?fsyms=" + symbols.join(',') + "&tsyms=" + base;
 };
 
 var INFURA_API_URL = "https://mainnet.infura.io/rdkuEWbeKAjSR9jZ6P1h";
@@ -71,6 +71,8 @@ var STATISTICS_TIME_WINDOW = 86400; /* 24 hours */
 var BLOCK_FETCH_COUNT = STATISTICS_TIME_WINDOW/15;
 
 var PRICE_UPDATE_TIMEOUT = 5*60*1000;
+
+var PRICE_SYMBOLS = ['ZRX', 'ETH', 'FUN', 'DNT', 'RLC', 'MTL']; /* FIXME arbitrary */
 
 /* From http://www.localeplanet.com/api/auto/currencymap.json */
 var CURRENCY_MAP = {
@@ -145,7 +147,7 @@ var Model = function (web3) {
   this._blockTimestamps = {};
 
   /* Price state */
-  this._zrxPrice = null;
+  this._tokenPrices = {};
   this._fiatCurrency = null;
 
   /* Callbacks */
@@ -206,8 +208,8 @@ Model.prototype = {
                     ZEROEX_TOKEN_ADDRESS = tokens[i].address;
                 }
               }).then(function () {
-                /* Update ZRX price */
-                self.updateZrxPrice();
+                /* Update prices */
+                self.updatePrices();
 
                 /* Subscribe to new fill logs */
                 self._zeroEx.exchange.subscribeAsync("LogFill", {}, self.handleLogFillEvent.bind(self, null));
@@ -304,7 +306,7 @@ Model.prototype = {
     var cutoffTimestamp = currentTimestamp - STATISTICS_TIME_WINDOW;
 
     var feeStats = {totalFees: new web3.BigNumber(0), relays: {}, feeCount: 0, feelessCount: 0};
-    var volumeStats = {totalTrades: 0, tokens: {}};
+    var volumeStats = {totalTrades: 0, totalVolumeFiat: new web3.BigNumber(0), tokens: {}};
 
     for (var i = 0; i < this._trades.length; i++) {
       /* Process up to statistics time window trades */
@@ -337,13 +339,29 @@ Model.prototype = {
       var takerVolume = normalizeTokenQuantity(takerToken, this._trades[i].filledTakerTokenAmount);
 
       if (volumeStats.tokens[makerToken] == undefined)
-        volumeStats.tokens[makerToken] = {volume: new web3.BigNumber(0), count: 0};
+        volumeStats.tokens[makerToken] = {volume: new web3.BigNumber(0), volumeFiat: new web3.BigNumber(0), count: 0};
       if (volumeStats.tokens[takerToken] == undefined)
-        volumeStats.tokens[takerToken] = {volume: new web3.BigNumber(0), count: 0};
+        volumeStats.tokens[takerToken] = {volume: new web3.BigNumber(0), volumeFiat: new web3.BigNumber(0), count: 0};
 
       /* Volume per token */
       volumeStats.tokens[makerToken].volume = volumeStats.tokens[makerToken].volume.add(makerVolume);
       volumeStats.tokens[takerToken].volume = volumeStats.tokens[takerToken].volume.add(takerVolume);
+
+      /* Fiat volume per token */
+      var makerTokenSymbol = ZEROEX_TOKEN_INFOS[makerToken] && ZEROEX_TOKEN_INFOS[makerToken].symbol || null;
+      var takerTokenSymbol = ZEROEX_TOKEN_INFOS[takerToken] && ZEROEX_TOKEN_INFOS[takerToken].symbol || null;
+
+      if (this._tokenPrices[makerTokenSymbol]) {
+        var fiatMakerVolume = makerVolume.mul(this._tokenPrices[makerTokenSymbol]);
+        volumeStats.tokens[makerToken].volumeFiat = volumeStats.tokens[makerToken].volumeFiat.add(fiatMakerVolume);
+        volumeStats.totalVolumeFiat = volumeStats.totalVolumeFiat.add(fiatMakerVolume);
+      }
+
+      if (this._tokenPrices[takerTokenSymbol]) {
+        var fiatTakerVolume = takerVolume.mul(this._tokenPrices[takerTokenSymbol]);
+        volumeStats.tokens[takerToken].volumeFiat = volumeStats.tokens[takerToken].volumeFiat.add(fiatTakerVolume);
+        volumeStats.totalVolumeFiat = volumeStats.totalVolumeFiat.add(fiatTakerVolume);
+      }
 
       /* Trade count per token and total trades */
       volumeStats.tokens[this._trades[i].makerToken].count += 1;
@@ -352,29 +370,35 @@ Model.prototype = {
     }
 
     /* Compute relay fees in fiat currency, if available */
-    feeStats.totalFeesFiat = (this._zrxPrice) ? feeStats.totalFees.mul(this._zrxPrice) : null;
-    feeStats.fiatCurrency = (this._zrxPrice) ? this._fiatCurrency : null;
+    var zrxPrice = this._tokenPrices['ZRX'];
+    feeStats.totalFeesFiat = zrxPrice ? feeStats.totalFees.mul(zrxPrice) : null;
+    feeStats.fiatCurrency = this._fiatCurrency;
 
     this.statisticsUpdatedCallback(feeStats, volumeStats);
   },
 
-  /* ZRX Price update */
+  /* Price table update */
 
-  updateZrxPrice: function () {
-    Logger.log('[Model] Fetching ZRX price');
+  updatePrices: function () {
+    Logger.log('[Model] Fetching token prices');
 
-    var endpoint = PRICE_API_URL('ZRX', this._fiatCurrency);
+    var endpoint = PRICE_API_URL(PRICE_SYMBOLS, this._fiatCurrency);
 
     var self = this;
-    return $.getJSON(endpoint).then(function (price) {
-      self._zrxPrice = price[self._fiatCurrency];
+    return $.getJSON(endpoint).then(function (prices) {
+      Logger.log('[Model] Got token prices');
+      Logger.log(prices);
 
-      Logger.log('[Model] Current ZRX Price: ' + self._zrxPrice);
+      for (var token in prices)
+        self._tokenPrices[token] = prices[token][self._fiatCurrency];
+
+      /* Map WETH to ETH */
+      self._tokenPrices['WETH'] = self._tokenPrices['ETH'];
 
       /* Update statistics */
       self.updateStatistics();
 
-      setTimeout(self.updateZrxPrice.bind(self), PRICE_UPDATE_TIMEOUT);
+      setTimeout(self.updatePrices.bind(self), PRICE_UPDATE_TIMEOUT);
     });
   },
 
@@ -572,12 +596,20 @@ View.prototype = {
     var currencyInfo = CURRENCY_MAP[feeStats.fiatCurrency];
     $('#currency-dropdown-text').text(currencyInfo.symbol + " " + feeStats.fiatCurrency);
 
+    /* Aggregate fiat volume */
+    if (volumeStats.totalVolumeFiat.gt(0)) {
+      var elem = $('<tr></tr>')
+                   .append($('<th></th>')
+                              .text("Aggregate Volume"))
+                   .append($('<td></td>')
+                              .text(this.formatPrice(volumeStats.totalVolumeFiat, currencyInfo)));
+      $('#volume').find("tbody").first().append(elem);
+    }
+
     /* ZRX Fees */
     var totalRelayFees = feeStats.totalFees.toFixed(6);
     if (feeStats.totalFeesFiat)
-      totalRelayFees += " (" + currencyInfo.symbol
-                             + feeStats.totalFeesFiat.toFixed(currencyInfo.decimal_digits)
-                             + " " + feeStats.fiatCurrency + ")";
+      totalRelayFees += " (" + this.formatPrice(feeStats.totalFeesFiat, currencyInfo) + ")";
 
     var elem = $('<tr></tr>')
                  .append($('<th></th>')
@@ -595,11 +627,15 @@ View.prototype = {
     var tokenCounts = [];
     for (var i = 0; i < tokens.length; i++) {
       if (ZEROEX_TOKEN_INFOS[tokens[i]]) {
+        var volume = volumeStats.tokens[tokens[i]].volume.toFixed(6);
+        if (volumeStats.tokens[tokens[i]].volumeFiat.gt(0))
+          volume += " (" + this.formatPrice(volumeStats.tokens[tokens[i]].volumeFiat, currencyInfo) + ")";
+
         var elem = $('<tr></tr>')
                      .append($('<th></th>')
                               .append(this.formatTokenLink(tokens[i])))
                      .append($('<td></td>')
-                               .text(volumeStats.tokens[tokens[i]].volume.toFixed(6)));
+                               .text(volume));
         $('#volume').find("tbody").first().append(elem);
 
         tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
@@ -657,6 +693,10 @@ View.prototype = {
     var seconds = (datetime.getUTCSeconds() < 10) ? ("0" + datetime.getUTCSeconds()) : datetime.getUTCSeconds();
 
     return year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
+  },
+
+  formatPrice: function (price, currencyInfo) {
+    return currencyInfo.symbol + price.toFixed(currencyInfo.decimal_digits) + " " + currencyInfo.code;
   },
 
   formatHex: function (hex, digits) {
