@@ -4,14 +4,6 @@ A real-time trade viewer for the [0x protocol](href="https://0xproject.com/").
 
 Visit it at http://0xtrades.info
 
-## Todo
-
-* More reliable log fetching when using Infura
-* Configurable fiat currency for ZRX price lookup
-* Filtering trades by relay
-* Extracting order information from trades
-* More efficient statistics updates
-
 ## File Structure
 
 * [`docs/`](docs/) - Website
