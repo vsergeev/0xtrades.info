@@ -474,6 +474,11 @@ View.prototype = {
     };
     this._tokensChart = new Chart($("#tokens-chart")[0].getContext('2d'), tokensChartConfig);
 
+    var tokensVolumeChartConfig = {
+      type: 'pie', options: {responsive: true}, data: { datasets: [{ backgroundColor: chartColors }] }
+    };
+    this._tokensVolumeChart = new Chart($("#tokens-volume-chart")[0].getContext('2d'), tokensChartConfig);
+
     for (var key in CURRENCY_MAP) {
       var text = CURRENCY_MAP[key].symbol + " " + key;
       $('#currency-dropdown-list').append($("<li></li>").append($("<a></a>").attr("href", "?cur=" + key).text(text)));
@@ -650,6 +655,20 @@ View.prototype = {
     this._tokensChart.data.labels = tokenNames;
     this._tokensChart.data.datasets[0].data = tokenCounts;
     this._tokensChart.update();
+
+    /* Token Fiat Volume Chart */
+    var tokenNames = [];
+    var tokenVolumes = []
+    for (var i = 0; i < tokens.length; i++) {
+      if (ZEROEX_TOKEN_INFOS[tokens[i]] && volumeStats.tokens[tokens[i]].volumeFiat.gt(0)) {
+        tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
+        tokenVolumes.push(volumeStats.tokens[tokens[i]].volumeFiat.toNumber());
+      }
+    }
+
+    this._tokensVolumeChart.data.labels = tokenNames;
+    this._tokensVolumeChart.data.datasets[0].data = tokenVolumes;
+    this._tokensVolumeChart.update();
 
     /* Relay Fee Chart */
     var relayAddresses = Object.keys(feeStats.relays);
