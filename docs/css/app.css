@@ -47,11 +47,7 @@ h3 {
 
 /******************************************************************************/
 
-#trade-list {
-  font-size: 0.8rem;
-}
-
-#trade-list .mono {
+#trade-list, #trade-list .mono {
   font-size: 0.8rem;
 }
 
