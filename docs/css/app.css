@@ -84,6 +84,10 @@ h3:hover .header-link {
   font-size: 0.8rem;
 }
 
+#trade-list table {
+  margin-bottom: 0.5rem;
+}
+
 #trade-list th, #trade-list td {
   white-space: nowrap;
 }
