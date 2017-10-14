@@ -46,6 +46,20 @@ var ZEROEX_EXCHANGE_ADDRESS = null;
 
 var ZEROEX_TOKEN_ADDRESS = null;
 
+var NETWORK_NAME = {
+  1: "Mainnet",
+  3: "Ropsten",
+  4: "Rinkeby",
+  42: "Kovan",
+};
+
+var NETWORK_BLOCK_EXPLORER = {
+  1: "https://etherscan.io",
+  3: "https://ropsten.etherscan.io",
+  4: "https://rinkeby.etherscan.io",
+  42: "https://kovan.etherscan.io",
+};
+
 var PRICE_API_URL = function (symbol, base) {
   return "https://min-api.cryptocompare.com/data/price?fsym=" + symbol + "&tsyms=" + base;
 };
@@ -345,20 +359,6 @@ Model.prototype = {
 /******************************************************************************/
 /* View */
 /******************************************************************************/
-
-var NETWORK_NAME = {
-  1: "Mainnet",
-  3: "Ropsten",
-  4: "Rinkeby",
-  42: "Kovan",
-};
-
-var NETWORK_BLOCK_EXPLORER = {
-  1: "https://etherscan.io",
-  3: "https://ropsten.etherscan.io",
-  4: "https://rinkeby.etherscan.io",
-  42: "https://kovan.etherscan.io",
-};
 
 var View = function () {
   /* Network status */
