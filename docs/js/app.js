@@ -72,8 +72,6 @@ var BLOCK_FETCH_COUNT = STATISTICS_TIME_WINDOW/15;
 
 var PRICE_UPDATE_TIMEOUT = 5*60*1000;
 
-var PRICE_SYMBOLS = ['ZRX', 'ETH', 'FUN', 'DNT', 'RLC', 'MTL']; /* FIXME arbitrary */
-
 /* From http://www.localeplanet.com/api/auto/currencymap.json */
 var CURRENCY_MAP = {
   "USD": {
@@ -382,7 +380,12 @@ Model.prototype = {
   updatePrices: function () {
     Logger.log('[Model] Fetching token prices');
 
-    var endpoint = PRICE_API_URL(PRICE_SYMBOLS, this._fiatCurrency);
+    /* Collect all symbols from token registry */
+    var symbols = ['ETH'];
+    for (var key in ZEROEX_TOKEN_INFOS)
+      symbols.push(ZEROEX_TOKEN_INFOS[key].symbol);
+
+    var endpoint = PRICE_API_URL(symbols, this._fiatCurrency);
 
     var self = this;
     return $.getJSON(endpoint).then(function (prices) {
