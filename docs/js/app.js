@@ -265,46 +265,54 @@ Model.prototype = {
     var volumeStats = {totalTrades: 0, tokens: {}};
 
     for (var i = 0; i < this._trades.length; i++) {
+      /* Process up to statistics time window trades */
       if (this._trades[i].timestamp < cutoffTimestamp)
         break;
 
-      /* Relay fee statistics */
-      var relayFee = normalizeTokenQuantity(ZEROEX_TOKEN_ADDRESS, this._trades[i].paidMakerFee.add(this._trades[i].paidTakerFee));
-      if (feeStats.relays[this._trades[i].feeRecipient] == undefined)
-        feeStats.relays[this._trades[i].feeRecipient] = new web3.BigNumber(0);
+      /*** Relay fee statistics ***/
 
-      feeStats.relays[this._trades[i].feeRecipient] = feeStats.relays[this._trades[i].feeRecipient].add(relayFee);
+      var relay = this._trades[i].feeRecipient;
+      var relayFee = normalizeTokenQuantity(ZEROEX_TOKEN_ADDRESS, this._trades[i].paidMakerFee.add(this._trades[i].paidTakerFee));
+
+      if (feeStats.relays[relay] == undefined)
+        feeStats.relays[relay] = new web3.BigNumber(0);
+
+      /* Fee per relay and total relay fees */
+      feeStats.relays[relay] = feeStats.relays[relay].add(relayFee);
       feeStats.totalFees = feeStats.totalFees.add(relayFee);
 
+      /* Fee vs Feeless trade count */
       if (!relayFee.eq(0))
         feeStats.feeCount += 1;
       else
         feeStats.feelessCount += 1;
 
-      /* Token volume and count statistics */
-      if (volumeStats.tokens[this._trades[i].makerToken] == undefined)
-        volumeStats.tokens[this._trades[i].makerToken] = {volume: new web3.BigNumber(0), count: 0};
-      if (volumeStats.tokens[this._trades[i].takerToken] == undefined)
-        volumeStats.tokens[this._trades[i].takerToken] = {volume: new web3.BigNumber(0), count: 0};
+      /*** Token volume and count statistics ***/
 
-      var makerVolume = normalizeTokenQuantity(this._trades[i].makerToken, this._trades[i].filledMakerTokenAmount);
-      var takerVolume = normalizeTokenQuantity(this._trades[i].takerToken, this._trades[i].filledTakerTokenAmount);
-      volumeStats.tokens[this._trades[i].makerToken].volume = volumeStats.tokens[this._trades[i].makerToken].volume.add(makerVolume);
-      volumeStats.tokens[this._trades[i].takerToken].volume = volumeStats.tokens[this._trades[i].takerToken].volume.add(takerVolume);
+      var makerToken = this._trades[i].makerToken;
+      var takerToken = this._trades[i].takerToken;
+      var makerVolume = normalizeTokenQuantity(makerToken, this._trades[i].filledMakerTokenAmount);
+      var takerVolume = normalizeTokenQuantity(takerToken, this._trades[i].filledTakerTokenAmount);
 
+      if (volumeStats.tokens[makerToken] == undefined)
+        volumeStats.tokens[makerToken] = {volume: new web3.BigNumber(0), count: 0};
+      if (volumeStats.tokens[takerToken] == undefined)
+        volumeStats.tokens[takerToken] = {volume: new web3.BigNumber(0), count: 0};
+
+      /* Volume per token */
+      volumeStats.tokens[makerToken].volume = volumeStats.tokens[makerToken].volume.add(makerVolume);
+      volumeStats.tokens[takerToken].volume = volumeStats.tokens[takerToken].volume.add(takerVolume);
+
+      /* Trade count per token and total trades */
       volumeStats.tokens[this._trades[i].makerToken].count += 1;
       volumeStats.tokens[this._trades[i].takerToken].count += 1;
       volumeStats.totalTrades += 1;
     }
 
     /* Compute relay fees in fiat currency, if available */
-    if (this._zrxPrice != null) {
-      feeStats.totalFeesFiat = feeStats.totalFees.mul(this._zrxPrice);
-      feeStats.fiatCurrency = this._fiatCurrency;
-      feeStats.fiatSymbol = this._fiatSymbol;
-    } else {
-      feeStats.totalFeesFiat = null;
-    }
+    feeStats.totalFeesFiat = (this._zrxPrice) ? feeStats.totalFees.mul(this._zrxPrice) : null;
+    feeStats.fiatCurrency = (this._zrxPrice) ? this._fiatCurrency : null;
+    feeStats.fiatSymbol = (this._zrxPrice) ? this._fiatSymbol : null;
 
     this.statisticsUpdatedCallback(feeStats, volumeStats);
   },
