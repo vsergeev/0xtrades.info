@@ -64,6 +64,10 @@ h3 {
   font-size: 0.8rem;
 }
 
+#trade-list th, #trade-list td {
+  white-space: nowrap;
+}
+
 #trade-list .overflow {
   max-width: 250px;
   overflow: hidden;
