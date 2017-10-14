@@ -146,8 +146,7 @@ var Model = function (web3) {
 
   /* Price state */
   this._zrxPrice = null;
-  this._fiatCurrency = this.getFiatCurrency(new URLSearchParams(window.location.search));
-  this._fiatSymbol = this.getFiatSymbol(this._fiatCurrency);
+  this._fiatCurrency = null;
 
   /* Callbacks */
   this.connectedCallback = null;
@@ -158,6 +157,10 @@ var Model = function (web3) {
 Model.prototype = {
   init: function () {
     var self = this;
+
+    /* Look up fiat currency in search parameters ?cur=<currency> */
+    var currency = (new URLSearchParams(window.location.search)).get("cur");
+    this._fiatCurrency = CURRENCY_MAP[currency] ? currency : "USD";
 
     /* Look up network id */
     self._web3.version.getNetwork(function (error, result) {
@@ -351,25 +354,11 @@ Model.prototype = {
     /* Compute relay fees in fiat currency, if available */
     feeStats.totalFeesFiat = (this._zrxPrice) ? feeStats.totalFees.mul(this._zrxPrice) : null;
     feeStats.fiatCurrency = (this._zrxPrice) ? this._fiatCurrency : null;
-    feeStats.fiatSymbol = (this._zrxPrice) ? this._fiatSymbol : null;
 
     this.statisticsUpdatedCallback(feeStats, volumeStats);
   },
 
   /* ZRX Price update */
-
-  getFiatCurrency: function(searchParams) {
-    var cur = searchParams.get('cur')
-    if (cur && CURRENCY_MAP[cur.toUpperCase()]) {
-      return cur.toUpperCase()
-    } else {
-      return "USD"
-    }
-  },
-
-  getFiatSymbol: function(currency) {
-    return CURRENCY_MAP[currency].symbol;
-  },
 
   updateZrxPrice: function () {
     Logger.log('[Model] Fetching ZRX price');
@@ -577,10 +566,18 @@ View.prototype = {
     /* Clear current volumes */
     $('#volume').find("tr").remove();
 
+    /* Update currency */
+    /* FIXME should we pass fiat currency in the connected event and do this
+     * once on init? */
+    var currencyInfo = CURRENCY_MAP[feeStats.fiatCurrency];
+    $('#currency-dropdown-text').text(currencyInfo.symbol + " " + feeStats.fiatCurrency);
+
     /* ZRX Fees */
-    var fees_text = feeStats.totalFees.toFixed(6);
+    var totalRelayFees = feeStats.totalFees.toFixed(6);
     if (feeStats.totalFeesFiat)
-      fees_text += " (" + feeStats.fiatSymbol + feeStats.totalFeesFiat.toFixed(2) + " " + feeStats.fiatCurrency + ")";
+      totalRelayFees += " (" + currencyInfo.symbol
+                             + feeStats.totalFeesFiat.toFixed(currencyInfo.decimal_digits)
+                             + " " + feeStats.fiatCurrency + ")";
 
     var elem = $('<tr></tr>')
                  .append($('<th></th>')
@@ -588,11 +585,9 @@ View.prototype = {
                             .append($("<span></span>")
                                       .text(" Relay Fees")))
                  .append($('<td></td>')
-                           .text(fees_text));
+                           .text(totalRelayFees));
 
     $('#volume').find("tbody").first().append(elem);
-
-    $('#currency-dropdown-text').text(feeStats.fiatCurrency);
 
     /* Token Volumes */
     var tokens = Object.keys(volumeStats.tokens);
