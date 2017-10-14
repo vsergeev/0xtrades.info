@@ -47,6 +47,12 @@
       "css": "github-circled",
       "code": 61595,
       "src": "fontawesome"
+    },
+    {
+      "uid": "815503841e980c848f55e0271deacead",
+      "css": "link",
+      "code": 59396,
+      "src": "entypo"
     }
   ]
 }

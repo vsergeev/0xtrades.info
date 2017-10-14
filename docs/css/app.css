@@ -17,6 +17,26 @@ h3 {
   margin-bottom: 1rem;
 }
 
+.anchor {
+  display: block;
+  visibility: hidden;
+  margin-top: -1.5rem;
+}
+
+.header-link {
+  font-size: 1rem;
+  line-height: 1rem;
+  vertical-align: middle;
+}
+
+.header-link {
+  opacity: 0;
+}
+
+h3:hover .header-link {
+  opacity: 1;
+}
+
 .mono {
   font-family: monospace, monospace;
   font-size: 1.0rem;
