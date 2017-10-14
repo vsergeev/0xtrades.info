@@ -157,7 +157,7 @@ Model.prototype = {
                 self._zeroEx.exchange.subscribeAsync("LogFill", {}, self.handleLogFillEvent.bind(self, null));
 
                 /* Fetch past fill logs */
-                self.fetchPastLogs(DEFAULT_FETCH_COUNT);
+                self.fetchPastTrades(DEFAULT_FETCH_COUNT);
               });
             }
           });
@@ -316,7 +316,7 @@ Model.prototype = {
 
   /* Operations */
 
-  fetchPastLogs: function (count) {
+  fetchPastTrades: function (count) {
     if (this._oldestBlockFetched) {
       var fromBlock = this._oldestBlockFetched - count;
       var toBlock = this._oldestBlockFetched;
@@ -678,7 +678,7 @@ Controller.prototype = {
     this.model.statisticsUpdatedCallback = this.view.handleStatisticsUpdatedEvent.bind(this.view);
 
     ///* Bind view -> model */
-    this.view.fetchMoreCallback = this.model.fetchPastLogs.bind(this.model);
+    this.view.fetchMoreCallback = this.model.fetchPastTrades.bind(this.model);
 
     ///* Initialize view */
     this.view.init();
