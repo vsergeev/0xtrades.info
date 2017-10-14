@@ -58,6 +58,45 @@ var BLOCK_FETCH_COUNT = STATISTICS_TIME_WINDOW/15;
 
 var PRICE_UPDATE_TIMEOUT = 5*60*1000;
 
+// http://www.localeplanet.com/api/auto/currencymap.json
+var CURRENCYMAP = {
+  "USD": {
+    "symbol": "$",
+    "symbol_native": "$",
+    "decimal_digits": 2,
+    "rounding": 0,
+    "code": "USD"
+  },
+  "EUR": {
+    "symbol": "€",
+    "symbol_native": "€",
+    "decimal_digits": 2,
+    "rounding": 0,
+    "code": "EUR"
+  },
+  "GBP": {
+    "symbol": "£",
+    "symbol_native": "£",
+    "decimal_digits": 2,
+    "rounding": 0,
+    "code": "GBP"
+  },
+  "JPY": {
+    "symbol": "¥",
+    "symbol_native": "￥",
+    "decimal_digits": 0,
+    "rounding": 0,
+    "code": "JPY"
+  },
+  "KRW": {
+    "symbol": "₩",
+    "symbol_native": "₩",
+    "decimal_digits": 0,
+    "rounding": 0,
+    "code": "KRW"
+  },
+}
+
 /******************************************************************************/
 /* Helper Functions */
 /******************************************************************************/
@@ -93,8 +132,8 @@ var Model = function (web3) {
 
   /* Price state */
   this._zrxPrice = null;
-  this._fiatCurrency = "USD";
-  this._fiatSymbol = "$";
+  this._fiatCurrency = this.getFiatCurrency(new URLSearchParams(window.location.search));
+  this._fiatSymbol = this.getFiatSymbol(this._fiatCurrency);
 
   /* Callbacks */
   this.connectedCallback = null;
@@ -297,6 +336,19 @@ Model.prototype = {
 
   /* ZRX Price update */
 
+  getFiatCurrency: function(searchParams) {
+    var cur = searchParams.get('cur')
+    if (cur && CURRENCYMAP[cur.toUpperCase()]) {
+      return cur.toUpperCase()
+    } else {
+      return "USD"
+    }
+  },
+
+  getFiatSymbol: function(currency) {
+    return CURRENCYMAP[currency].symbol;
+  },
+
   updateZrxPrice: function () {
     Logger.log('[Model] Fetching ZRX price');
 
@@ -394,6 +446,12 @@ View.prototype = {
       type: 'pie', options: {responsive: true}, data: { datasets: [{ backgroundColor: chartColors }] }
     };
     this._tokensChart = new Chart($("#tokens-chart")[0].getContext('2d'), tokensChartConfig);
+
+    for (var key in CURRENCYMAP) {
+      if (CURRENCYMAP.hasOwnProperty(key)) {
+        $('#currency-dropdown-list').append(`<li><a href="?cur=${key}">${key}</a></li>`)
+      }
+    }
   },
 
   /* Event update handlers */
@@ -513,6 +571,8 @@ View.prototype = {
                            .text(fees_text));
 
     $('#volume').find("tbody").first().append(elem);
+
+    $('#currencyDropdown').html(feeStats.fiatCurrency + '<span class="caret"></span>')
 
     /* Token Volumes */
     var tokens = Object.keys(volumeStats.tokens);
