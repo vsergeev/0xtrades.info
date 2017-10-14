@@ -459,23 +459,37 @@ View.prototype = {
                        '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d',
                        '#17becf', '#9edae5']
 
+    var tooltipLabelCallback = function (item, data) {
+      var label = data.labels[item.index];
+      var value = data.datasets[item.datasetIndex].tooltips[item.index] || data.datasets[item.datasetIndex].data[item.index];
+      return label + ": " + value;
+    }
+
     var relayFeeChartConfig = {
-      type: 'pie', options: {responsive: true}, data: { datasets: [{ backgroundColor: chartColors }] }
+      type: 'pie',
+      options: {responsive: true, tooltips: {callbacks: {label: tooltipLabelCallback}}},
+      data: { datasets: [{ backgroundColor: chartColors, tooltips: [] }] }
     };
     this._relayFeeChart = new Chart($("#relay-fee-chart")[0].getContext('2d'), relayFeeChartConfig);
 
     var feeChartConfig = {
-      type: 'pie', options: {responsive: true}, data: { datasets: [{ backgroundColor: chartColors }] }
+      type: 'pie',
+      options: {responsive: true, tooltips: {callbacks: {label: tooltipLabelCallback}}},
+      data: { datasets: [{ backgroundColor: chartColors, tooltips: [] }] }
     };
     this._feeChart = new Chart($("#fee-chart")[0].getContext('2d'), feeChartConfig);
 
     var tokensChartConfig = {
-      type: 'pie', options: {responsive: true}, data: { datasets: [{ backgroundColor: chartColors }] }
+      type: 'pie',
+      options: {responsive: true, tooltips: {callbacks: {label: tooltipLabelCallback}}},
+      data: { datasets: [{ backgroundColor: chartColors, tooltips: [] }] }
     };
     this._tokensChart = new Chart($("#tokens-chart")[0].getContext('2d'), tokensChartConfig);
 
     var tokensVolumeChartConfig = {
-      type: 'pie', options: {responsive: true}, data: { datasets: [{ backgroundColor: chartColors }] }
+      type: 'pie',
+      options: {responsive: true, tooltips: {callbacks: {label: tooltipLabelCallback}}},
+      data: { datasets: [{ backgroundColor: chartColors, tooltips: [] }] }
     };
     this._tokensVolumeChart = new Chart($("#tokens-volume-chart")[0].getContext('2d'), tokensVolumeChartConfig);
 
@@ -659,31 +673,37 @@ View.prototype = {
     /* Token Fiat Volume Chart */
     var tokenNames = [];
     var tokenVolumes = []
+    var tokenVolumesFormatted = [];
     for (var i = 0; i < tokens.length; i++) {
       if (ZEROEX_TOKEN_INFOS[tokens[i]] && volumeStats.tokens[tokens[i]].volumeFiat.gt(0)) {
         tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
         tokenVolumes.push(volumeStats.tokens[tokens[i]].volumeFiat.toNumber());
+        tokenVolumesFormatted.push(this.formatPrice(volumeStats.tokens[tokens[i]].volumeFiat, currencyInfo));
       }
     }
 
     this._tokensVolumeChart.data.labels = tokenNames;
     this._tokensVolumeChart.data.datasets[0].data = tokenVolumes;
+    this._tokensVolumeChart.data.datasets[0].tooltips = tokenVolumesFormatted;
     this._tokensVolumeChart.update();
 
     /* Relay Fee Chart */
     var relayAddresses = Object.keys(feeStats.relays);
     var relayNames = [];
     var relayFees = [];
+    var relayFeesFormatted = [];
     for (var i = 0; i < relayAddresses.length; i++) {
       if (web3.toDecimal(relayAddresses[i]) == 0)
         continue;
 
       relayNames.push(this.formatRelay(relayAddresses[i]));
       relayFees.push(feeStats.relays[relayAddresses[i]].toNumber());
+      relayFeesFormatted.push(feeStats.relays[relayAddresses[i]].toDigits(6) + " ZRX");
     }
 
     this._relayFeeChart.data.labels = relayNames;
     this._relayFeeChart.data.datasets[0].data = relayFees;
+    this._relayFeeChart.data.datasets[0].tooltips = relayFeesFormatted;
     this._relayFeeChart.update();
 
     /* Fee vs Fee-less Chart */
