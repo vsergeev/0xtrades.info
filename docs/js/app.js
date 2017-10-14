@@ -366,6 +366,7 @@ var View = function () {
 
   /* State */
   this._trades = [];
+  this._priceInverted = false;
 
   /* Callbacks */
   this.fetchMoreCallback = null;
@@ -374,6 +375,8 @@ var View = function () {
 View.prototype = {
   init: function () {
     $('#fetch-button').click(this.handleFetchMore.bind(this));
+
+    $('#price-invert').click(this.handlePriceInvert.bind(this));
 
     var chartColors = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a',
                        '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94',
@@ -454,9 +457,10 @@ View.prototype = {
                 .append(takerToken);
 
     /* Compute price */
-    var price = "Unknown";
+    var price = invertedPrice = "Unknown";
     if (ZEROEX_TOKEN_INFOS[trade.makerToken] != undefined && ZEROEX_TOKEN_INFOS[trade.takerToken] != undefined) {
       var price = makerQuantity.div(takerQuantity);
+      var invertedPrice = takerQuantity.div(makerQuantity).toDigits(6);
       price = price.toDigits(6);
     }
 
@@ -474,7 +478,10 @@ View.prototype = {
                           .addClass('overflow')
                           .html(swap))
                 .append($('<td></td>')      /* Price */
-                          .text(price))
+                          .html(`
+                            <span class="m_t">${price}</span>
+                            <span class="t_m" style="display:none;">${invertedPrice}</span>
+                            `))
                 .append($('<td></td>')      /* Relay Address */
                           .html(this.formatRelayLink(trade.feeRecipient)))
                 .append($('<td></td>')      /* Maker Fee */
@@ -563,6 +570,17 @@ View.prototype = {
 
   handleFetchMore: function () {
     this.fetchMoreCallback(BLOCK_FETCH_COUNT);
+  },
+
+  handlePriceInvert: function() {
+    this._priceInverted = !this._priceInverted;
+    if (this._priceInverted) {
+      $('.t_m').show()
+      $('.m_t').hide()
+    } else {
+      $('.t_m').hide()
+      $('.m_t').show()
+    }
   },
 
   /* Formatting Helpers */
