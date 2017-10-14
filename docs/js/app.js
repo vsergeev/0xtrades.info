@@ -209,7 +209,7 @@ Model.prototype = {
     } else {
         Logger.log('[Model] Got Log Fill event');
 
-        /* If we've already processed this trade, skipped it */
+        /* If we've already processed this trade, skip it */
         if (this._tradesSeen[result.transactionHash + result.logIndex])
           return;
 
