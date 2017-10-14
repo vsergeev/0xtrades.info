@@ -553,8 +553,8 @@ View.prototype = {
     this._relayFeeChart.data.datasets[0].data = relayFees;
     this._relayFeeChart.update();
 
-    /* Fee vs Feeless Chart */
-    this._feeChart.data.labels = ["Fees", "Feeless"];
+    /* Fee vs Fee-less Chart */
+    this._feeChart.data.labels = ["Fee", "Fee-less"];
     this._feeChart.data.datasets[0].data = [feeStats.feeCount, feeStats.feelessCount];
     this._feeChart.update();
   },
