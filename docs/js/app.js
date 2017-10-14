@@ -466,7 +466,6 @@ View.prototype = {
                 .append($('<td></td>')      /* Time */
                           .text(timestamp))
                 .append($('<td></td>')      /* Transaction ID */
-                          .addClass('mono')
                           .html(this.formatTxidLink(trade.txid, this.formatHex(trade.txid, 8))))
                 .append($('<td></td>')      /* Trade */
                           .addClass('overflow')
