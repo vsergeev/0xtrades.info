@@ -27,10 +27,6 @@
 /* Constants */
 /******************************************************************************/
 
-var STATISTICS_TIME_WINDOW = 86400;
-
-var DEFAULT_FETCH_COUNT = STATISTICS_TIME_WINDOW/15;
-
 var ZEROEX_GENESIS_BLOCK = {
   1: 4145578,
   42: 4145578,
@@ -55,6 +51,10 @@ var PRICE_API_URL = function (symbol, base) {
 };
 
 var INFURA_API_URL = "https://mainnet.infura.io/rdkuEWbeKAjSR9jZ6P1h";
+
+var STATISTICS_TIME_WINDOW = 86400; /* 24 hours */
+
+var BLOCK_FETCH_COUNT = STATISTICS_TIME_WINDOW/15;
 
 var PRICE_UPDATE_TIMEOUT = 5*60*1000;
 
@@ -157,7 +157,7 @@ Model.prototype = {
                 self._zeroEx.exchange.subscribeAsync("LogFill", {}, self.handleLogFillEvent.bind(self, null));
 
                 /* Fetch past fill logs */
-                self.fetchPastTrades(DEFAULT_FETCH_COUNT);
+                self.fetchPastTrades(BLOCK_FETCH_COUNT);
               });
             }
           });
@@ -562,7 +562,7 @@ View.prototype = {
   /* Button handler */
 
   handleFetchMore: function () {
-    this.fetchMoreCallback(DEFAULT_FETCH_COUNT);
+    this.fetchMoreCallback(BLOCK_FETCH_COUNT);
   },
 
   /* Formatting Helpers */
