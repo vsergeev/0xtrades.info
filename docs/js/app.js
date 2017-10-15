@@ -632,9 +632,11 @@ View.prototype = {
     };
     this._tokensVolumeChart = new Chart($("#tokens-volume-chart")[0].getContext('2d'), tokensVolumeChartConfig);
 
+    var searchParams = new URLSearchParams(window.location.search);
     for (var key in CURRENCY_MAP) {
       var text = CURRENCY_MAP[key].symbol + " " + key;
-      $('#currency-dropdown-list').append($("<li></li>").append($("<a></a>").attr("href", "?cur=" + key).text(text)));
+      searchParams.set('cur', key);
+      $('#currency-dropdown-list').append($("<li></li>").append($("<a></a>").attr("href", "?" + searchParams.toString()).text(text)));
     }
 
     /* Enable first price chart */
