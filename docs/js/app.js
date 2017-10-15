@@ -589,8 +589,13 @@ View.prototype = {
     /* Compute price */
     var mtPrice = tmPrice = "Unknown";
     if (ZEROEX_TOKEN_INFOS[trade.makerToken] != undefined && ZEROEX_TOKEN_INFOS[trade.takerToken] != undefined) {
-      var mtPrice = makerQuantity.div(takerQuantity).toDigits(6);
-      var tmPrice = takerQuantity.div(makerQuantity).toDigits(6);
+      mtPrice = makerQuantity.div(takerQuantity).toDigits(6);
+      tmPrice = takerQuantity.div(makerQuantity).toDigits(6);
+    } else if (makerQuantity.eq(takerQuantity)) {
+      /* Special case of equal maker/take quantities doesn't require token
+       * decimals */
+      mtPrice = 1;
+      tmPrice = 1;
     }
 
     var price = $("<span></span>")
