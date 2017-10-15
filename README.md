@@ -8,6 +8,7 @@ Visit it at http://0xtrades.info
 
 * [`docs/`](docs/) - Website
     * [`css/`](docs/css)
+        * [`app.css`](docs/css/app.css) - Website stylesheet
     * [`js/`](docs/js)
         * [`app.js`](docs/js/app.js) - Website application
     * [`index.html`](docs/index.html) - Website layout
