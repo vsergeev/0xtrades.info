@@ -72,6 +72,8 @@ var BLOCK_FETCH_COUNT = Math.ceil(STATISTICS_TIME_WINDOW/17);
 
 var PRICE_UPDATE_TIMEOUT = 5*60*1000;
 
+var PRICE_CHART_DEFAULT_PAIR = "ZRX:WETH";
+
 /* From http://www.localeplanet.com/api/auto/currencymap.json */
 var CURRENCY_MAP = {
   "USD": {
@@ -461,6 +463,104 @@ Model.prototype = {
 };
 
 /******************************************************************************/
+/* Price History */
+/******************************************************************************/
+
+var PriceVolumeHistory = function () {
+  /* State */
+  this.tokens = [];
+  this._priceData = {};
+  this._volumeData = {};
+  this._timestamps = {};
+};
+
+PriceVolumeHistory.prototype = {
+  /* Insert price data */
+  insert: function (maker, taker, timestamp, mtPrice, tmPrice, makerVolume, takerVolume) {
+    /* Initialize data structures */
+    this._initialize(maker, taker);
+    this._initialize(taker, maker);
+
+    /* Find index for this data */
+    var index = 0;
+    for (index = 0; index < this._timestamps[maker][taker].length; index++) {
+      if (this._timestamps[maker][taker][index] > timestamp)
+        break;
+    }
+
+    /* Create date object */
+    var date = new Date(timestamp*1000);
+
+    /* Save the timestamp and prices */
+    this._timestamps[maker][taker].splice(index, 0, timestamp);
+    this._timestamps[taker][maker].splice(index, 0, timestamp);
+    this._priceData[maker][taker].splice(index, 0, {x: date, y: mtPrice});
+    this._priceData[taker][maker].splice(index, 0, {x: date, y: tmPrice});
+    this._volumeData[maker][taker].splice(index, 0, {x: date, y: takerVolume});
+    this._volumeData[taker][maker].splice(index, 0, {x: date, y: makerVolume});
+  },
+
+  /* Get price data for a token pair */
+  getPriceData: function (tokenPair) {
+    var [quote, base] = tokenPair.split(":");
+
+    if (this._priceData[base] && this._priceData[base][quote])
+      return this._priceData[base][quote];
+
+    return [];
+  },
+
+  /* Get volume data for a token pair */
+  getVolumeData: function (tokenPair) {
+    var [quote, base] = tokenPair.split(":");
+
+    if (this._volumeData[base] && this._volumeData[base][quote])
+      return this._volumeData[base][quote];
+
+    return [];
+  },
+
+  /* Prune old data outside of statistics window */
+  prune: function () {
+    var currentTimestamp = Math.round((new Date()).getTime() / 1000);
+    var cutoffTimestamp = currentTimestamp - STATISTICS_TIME_WINDOW;
+
+    var pruned = false;
+
+    for (var maker in this._timestamps) {
+      for (var taker in this._timestamps) {
+        while (this._timestamps[maker][taker] && this._timestamps[maker][taker][0] < cutoffTimestamp) {
+          this._timestamps[maker][taker].shift();
+          this._timestamps[taker][maker].shift();
+          this._priceData[maker][taker].shift();
+          this._priceData[taker][maker].shift();
+          this._volumeData[maker][taker].shift();
+          this._volumeData[taker][maker].shift();
+          pruned = true;
+        }
+      }
+    }
+
+    return pruned;
+  },
+
+  /* Initialize state for maker/taker tokens a and b */
+  _initialize: function (a, b) {
+    if (this._priceData[a] === undefined) {
+      this._priceData[a] = {};
+      this._volumeData[a] = {};
+      this._timestamps[a] = {};
+    }
+    if (this._priceData[a][b] === undefined) {
+      this._priceData[a][b] = [];
+      this._volumeData[a][b] = [];
+      this._timestamps[a][b] = [];
+      this.tokens.push(a + ":" + b);
+    }
+  },
+};
+
+/******************************************************************************/
 /* View */
 /******************************************************************************/
 
@@ -471,6 +571,8 @@ var View = function () {
   /* State */
   this._trades = [];
   this._priceInverted = false;
+  this._priceCharts = [];
+  this._priceVolumeHistory = new PriceVolumeHistory();
 
   /* Callbacks */
   this.fetchMoreCallback = null;
@@ -479,13 +581,13 @@ var View = function () {
 View.prototype = {
   init: function () {
     $('#fetch-button').click(this.handleFetchMore.bind(this));
-
     $('#price-invert').click(this.handlePriceInvert.bind(this));
+    $('#add-price-chart-button').click(this.handleAddPriceChart.bind(this));
 
-    var chartColors = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a',
-                       '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94',
-                       '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d',
-                       '#17becf', '#9edae5']
+    this._chartColors = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a',
+                         '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94',
+                         '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d',
+                         '#17becf', '#9edae5']
 
     var tooltipLabelCallback = function (item, data) {
       var label = data.labels[item.index];
@@ -496,28 +598,28 @@ View.prototype = {
     var relayFeeChartConfig = {
       type: 'pie',
       options: {responsive: true, tooltips: {callbacks: {label: tooltipLabelCallback}}},
-      data: { datasets: [{ backgroundColor: chartColors, tooltips: [] }] }
+      data: { datasets: [{ backgroundColor: this._chartColors, tooltips: [] }] }
     };
     this._relayFeeChart = new Chart($("#relay-fee-chart")[0].getContext('2d'), relayFeeChartConfig);
 
     var feeChartConfig = {
       type: 'pie',
       options: {responsive: true, tooltips: {callbacks: {label: tooltipLabelCallback}}},
-      data: { datasets: [{ backgroundColor: chartColors, tooltips: [] }] }
+      data: { datasets: [{ backgroundColor: this._chartColors, tooltips: [] }] }
     };
     this._feeChart = new Chart($("#fee-chart")[0].getContext('2d'), feeChartConfig);
 
     var tokensChartConfig = {
       type: 'pie',
       options: {responsive: true, tooltips: {callbacks: {label: tooltipLabelCallback}}},
-      data: { datasets: [{ backgroundColor: chartColors, tooltips: [] }] }
+      data: { datasets: [{ backgroundColor: this._chartColors, tooltips: [] }] }
     };
     this._tokensChart = new Chart($("#tokens-chart")[0].getContext('2d'), tokensChartConfig);
 
     var tokensVolumeChartConfig = {
       type: 'pie',
       options: {responsive: true, tooltips: {callbacks: {label: tooltipLabelCallback}}},
-      data: { datasets: [{ backgroundColor: chartColors, tooltips: [] }] }
+      data: { datasets: [{ backgroundColor: this._chartColors, tooltips: [] }] }
     };
     this._tokensVolumeChart = new Chart($("#tokens-volume-chart")[0].getContext('2d'), tokensVolumeChartConfig);
 
@@ -525,6 +627,9 @@ View.prototype = {
       var text = CURRENCY_MAP[key].symbol + " " + key;
       $('#currency-dropdown-list').append($("<li></li>").append($("<a></a>").attr("href", "?cur=" + key).text(text)));
     }
+
+    /* Enable first price chart */
+    this.enablePriceChart(0);
   },
 
   /* Event update handlers */
@@ -545,6 +650,7 @@ View.prototype = {
           .html(this.formatAddressLink(ZEROEX_EXCHANGE_ADDRESS, networkName, true)));
 
       $('#fetch-button').prop('disabled', false);
+      $('#add-price-chart-button').prop('disabled', false);
     } else {
       $('#status-bar-network')
         .append($('<b></b>')
@@ -571,26 +677,36 @@ View.prototype = {
     var timestamp = this.formatDateTime(new Date(trade.timestamp*1000));
 
     /* Normalize traded quantities */
-    var makerQuantity = normalizeTokenQuantity(trade.makerToken, trade.filledMakerTokenAmount).toDigits(6);
-    var takerQuantity = normalizeTokenQuantity(trade.takerToken, trade.filledTakerTokenAmount).toDigits(6);
-    var makerQuantityNormalized = !!ZEROEX_TOKEN_INFOS[trade.makerToken]
-    var takerQuantityNormalized = !!ZEROEX_TOKEN_INFOS[trade.takerToken]
+    var makerQuantity = normalizeTokenQuantity(trade.makerToken, trade.filledMakerTokenAmount);
+    var takerQuantity = normalizeTokenQuantity(trade.takerToken, trade.filledTakerTokenAmount);
+    var makerQuantityNormalized = !!ZEROEX_TOKEN_INFOS[trade.makerToken];
+    var takerQuantityNormalized = !!ZEROEX_TOKEN_INFOS[trade.takerToken];
     var makerTokenLink = this.formatTokenLink(trade.makerToken);
     var takerTokenLink = this.formatTokenLink(trade.takerToken);
+    var makerTokenSymbol = ZEROEX_TOKEN_INFOS[trade.makerToken] && ZEROEX_TOKEN_INFOS[trade.makerToken].symbol;
+    var takerTokenSymbol = ZEROEX_TOKEN_INFOS[trade.takerToken] && ZEROEX_TOKEN_INFOS[trade.takerToken].symbol;
 
     /* Format trade string */
     var swap = $("<span></span>")
-                .append($(makerQuantityNormalized ? "<span></span>" : "<i></i>").text(makerQuantity + " "))
+                .append($(makerQuantityNormalized ? "<span></span>" : "<i></i>").text(makerQuantity.toDigits(6) + " "))
                 .append(makerTokenLink)
                 .append($("<span></span>").text(" ↔ "))
-                .append($(takerQuantityNormalized ? "<span></span>" : "<i></i>").text(takerQuantity + " "))
+                .append($(takerQuantityNormalized ? "<span></span>" : "<i></i>").text(takerQuantity.toDigits(6) + " "))
                 .append(takerTokenLink);
 
     /* Compute price */
     var mtPrice = tmPrice = "Unknown";
-    if (ZEROEX_TOKEN_INFOS[trade.makerToken] != undefined && ZEROEX_TOKEN_INFOS[trade.takerToken] != undefined) {
-      mtPrice = makerQuantity.div(takerQuantity).toDigits(6);
-      tmPrice = takerQuantity.div(makerQuantity).toDigits(6);
+    if (makerTokenSymbol && takerTokenSymbol) {
+      mtPrice = makerQuantity.div(takerQuantity);
+      tmPrice = takerQuantity.div(makerQuantity);
+
+      /* Update our price history for this token pair */
+      this._priceVolumeHistory.insert(makerTokenSymbol, takerTokenSymbol, trade.timestamp,
+                                      mtPrice.toNumber(), tmPrice.toNumber(),
+                                      makerQuantity.toNumber(), takerQuantity.toNumber());
+
+      mtPrice = mtPrice.toDigits(6);
+      tmPrice = tmPrice.toDigits(6);
     } else if (makerQuantity.eq(takerQuantity)) {
       /* Special case of equal maker/take quantities doesn't require token
        * decimals */
@@ -745,18 +861,113 @@ View.prototype = {
     this._feeChart.data.labels = ["Fee", "Fee-less"];
     this._feeChart.data.datasets[0].data = [feeStats.feeCount, feeStats.feelessCount];
     this._feeChart.update();
+
+    /* Prune price/volume history */
+    this._priceVolumeHistory.prune();
+
+    /* Update price charts */
+    for (var i = 0; i < this._priceCharts.length; i++)
+      this.updatePriceChart(i);
   },
 
-  /* Button handler */
+  updatePriceChart: function (index) {
+    /* Update selected token pair */
+    $('#price-chart-pair-text-' + index).text(this._priceCharts[index].tokenPair);
+
+    /* Update token pair list */
+    var self = this;
+    $('#price-chart-pair-list-' + index).find("li").remove();
+    for (var j = 0; j < this._priceVolumeHistory.tokens.length; j++) {
+      $('#price-chart-pair-list-' + index).append(
+        $("<li></li>")
+          .append($("<a></a>")
+                    .text(this._priceVolumeHistory.tokens[j])
+                    .attr('href', '#')
+                    .on('click', {index: index, pair: this._priceVolumeHistory.tokens[j]}, function (e) {
+                      e.preventDefault();
+                      self.handleSelectPriceChartTokenPair(e.data.index, e.data.pair);
+                    }))
+      );
+    }
+
+    /* Update data */
+    this._priceCharts[index].chart.data.datasets[0].data = this._priceVolumeHistory.getPriceData(this._priceCharts[index].tokenPair);
+    this._priceCharts[index].chart.update();
+  },
+
+  /* Button handlers */
 
   handleFetchMore: function () {
     this.fetchMoreCallback(BLOCK_FETCH_COUNT);
   },
 
-  handlePriceInvert: function() {
+  handlePriceInvert: function () {
     this._priceInverted = !this._priceInverted;
     $('.t_m').toggle()
     $('.m_t').toggle()
+  },
+
+  handleAddPriceChart: function () {
+    var index = this.addPriceChartToDom();
+    this.enablePriceChart(index);
+    this.updatePriceChart(index);
+  },
+
+  handleSelectPriceChartTokenPair: function (index, tokenPair) {
+    this._priceCharts[index].tokenPair = tokenPair;
+    this.updatePriceChart(index);
+  },
+
+  /* Price charts */
+
+  addPriceChartToDom: function () {
+    var index = this._priceCharts.length;
+
+    var elem = `
+      <div class="row">
+        <span class="anchor" id="price-chart-24hr-${index}"></span>
+        <h3>Price Chart (24 hr)<a class="header-link" href="#price-chart-24hr-${index}"><i class="icon-link"></i></a></h3>
+      </div>
+      <div class="row">
+        <div class="dropdown-center">
+          <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="price-chart-pair-${index}" data-toggle="dropdown" aria-haspopup="true">
+            <span id="price-chart-pair-text-${index}"></span>
+            <span class="caret"></span>
+          </button>
+          <ul id="price-chart-pair-list-${index}" class="dropdown-menu" aria-labelledby="price-chart-pair-${index}"></ul>
+        </div>
+      </div>
+      <div class="row canvas-wrapper text-center">
+        <canvas class="text-center" id="price-chart-${index}" width="800" height="400"></canvas>
+      </div>
+    `;
+
+    $('.row').eq(-1).before(elem);
+
+    return index;
+  },
+
+  enablePriceChart: function (index) {
+    var priceChartConfig = {
+      type: 'line',
+      options: {
+        responsive: true,
+        legend: { display: false },
+        scales: {
+          xAxes: [
+            { type: 'time', time: { unit: 'minute' }, ticks: { autoSkip: true, maxTicksLimit: 30 }, },
+          ],
+        }
+      },
+      data: {
+        datasets: [
+          { borderDash: [5, 5], borderColor: this._chartColors[0], fill: false, },
+        ]
+      }
+    };
+    var priceChart = new Chart($("#price-chart-" + index)[0].getContext('2d'), priceChartConfig);
+
+    this._priceCharts.push({index: index, tokenPair: PRICE_CHART_DEFAULT_PAIR, chart: priceChart});
   },
 
   /* Formatting Helpers */

@@ -23,7 +23,7 @@
     <div class="row">
       <span class="anchor" id="volume-24hr"></span>
       <h3>Volume (24 hr)<a class="header-link" href="#volume-24hr"><i class="icon-link"></i></a></h3>
-      <div class="dropdown currency-picker">
+      <div class="dropdown-right">
         <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="currency-dropdown" data-toggle="dropdown" aria-haspopup="true">
           <span id="currency-dropdown-text"></span>
           <span class="caret"></span>
@@ -106,6 +106,29 @@
         </div>
       </div>
     </div>
+
+    <div class="row">
+      <span class="anchor" id="price-chart-24hr-0"></span>
+      <h3>Price Chart (24 hr)<a class="header-link" href="#price-chart-24hr-0"><i class="icon-link"></i></a></h3>
+    </div>
+    <div class="row">
+      <div class="dropdown-center">
+        <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="price-chart-pair-0" data-toggle="dropdown" aria-haspopup="true">
+          <span id="price-chart-pair-text-0"></span>
+          <span class="caret"></span>
+        </button>
+        <ul id="price-chart-pair-list-0" class="dropdown-menu" aria-labelledby="price-chart-pair-0"></ul>
+      </div>
+    </div>
+    <div class="row canvas-wrapper text-center">
+      <canvas class="text-center" id="price-chart-0" width="800" height="400"></canvas>
+    </div>
+
+    <div class="row">
+      <div class="text-center">
+        <button id="add-price-chart-button" type="button" class="btn btn-sm btn-info" disabled>Add Chart</button>
+      </div>
+    </div>
   </div>
 
   <footer class="footer">
@@ -148,6 +171,7 @@
   <script src="js/web3.min.js"></script>
   <script src="js/ZeroClientProvider.min.js"></script>
   <script src="js/0x.min.js"></script>
+  <script src="js/moment.min.js"></script>
   <script src="js/Chart.min.js"></script>
   <script src="js/app.js"></script>
   </body>

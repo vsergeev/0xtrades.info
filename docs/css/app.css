@@ -69,15 +69,20 @@ h3:hover .header-link {
   margin-bottom: 0;
 }
 
-.currency-picker {
+.dropdown-right {
   margin: auto 0 0.5rem auto;
 }
 
-#currency-dropdown-list {
+.dropdown-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dropdown-menu {
   min-width: 0;
 }
 
-#currency-dropdown-list li {
+.dropdown-menu li {
   padding: 0 15px 0 10px;
   white-space: nowrap;
 }
