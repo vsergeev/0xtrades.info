@@ -111,7 +111,9 @@ var CURRENCY_MAP = {
     "rounding": 0,
     "code": "KRW"
   },
-}
+};
+
+var CURRENCY_DEFAULT = "USD";
 
 /******************************************************************************/
 /* Helper Functions */
@@ -129,7 +131,7 @@ var normalizeTokenQuantity = function (token, quantity) {
 /* Model */
 /******************************************************************************/
 
-var Model = function (web3) {
+var Model = function (web3, currency) {
   /* web3 interface */
   this._web3 = web3;
   this._zeroEx = new ZeroEx.ZeroEx(web3.currentProvider);
@@ -149,7 +151,7 @@ var Model = function (web3) {
 
   /* Price state */
   this._tokenPrices = {};
-  this._fiatCurrency = null;
+  this._fiatCurrency = CURRENCY_MAP[currency] ? currency : CURRENCY_DEFAULT;
 
   /* Callbacks */
   this.connectedCallback = null;
@@ -160,10 +162,6 @@ var Model = function (web3) {
 Model.prototype = {
   init: function () {
     var self = this;
-
-    /* Look up fiat currency in search parameters ?cur=<currency> */
-    var currency = (new URLSearchParams(window.location.search)).get("cur");
-    this._fiatCurrency = CURRENCY_MAP[currency] ? currency : "USD";
 
     /* Look up network id */
     self._web3.version.getNetwork(function (error, result) {
@@ -1137,14 +1135,35 @@ App = {
   controller: null,
 
   init: function () {
-    if (typeof web3 !== 'undefined') {
-      window.web3 = new Web3(web3.currentProvider);
-    } else {
-      var provider = new ZeroClientProvider({getAccounts: function (cb) { cb(null, []); }, rpcUrl: INFURA_API_URL});
-      window.web3 = new Web3(provider);
-    }
+    var params = (new URLSearchParams(window.location.search));
+    /* Supported parameters:
+         debug
+         provider: current, localhost, infura
+         cur: USD, EUR, etc.
+     */
 
-    App.model = new Model(window.web3);
+    /* Enable logging in debug mode */
+    if (params.has("debug"))
+      Logger.enabled = true;
+
+    /* Look up currency */
+    var currency = params.get("cur");
+
+    /* Look up provider */
+    var provider = params.get("provider");
+
+    if (!provider)
+      provider = (typeof web3 !== 'undefined') ? 'current' : 'infura';
+
+    Logger.log('[App] Using web3 provider ' + provider);
+    if (provider == 'current')
+      window.web3 = new Web3(web3.currentProvider);
+    else if (provider == 'localhost')
+      window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    else if (provider == 'infura')
+      window.web3 = new Web3(new ZeroClientProvider({getAccounts: function (cb) { cb(null, []); }, rpcUrl: INFURA_API_URL}));
+
+    App.model = new Model(window.web3, currency);
     App.view = new View();
     App.controller = new Controller(App.model, App.view);
 
