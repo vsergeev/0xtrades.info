@@ -68,7 +68,7 @@ var INFURA_API_URL = "https://mainnet.infura.io/rdkuEWbeKAjSR9jZ6P1h";
 
 var STATISTICS_TIME_WINDOW = 86400; /* 24 hours */
 
-var BLOCK_FETCH_COUNT = STATISTICS_TIME_WINDOW/15;
+var BLOCK_FETCH_COUNT = Math.ceil(STATISTICS_TIME_WINDOW/17);
 
 var PRICE_UPDATE_TIMEOUT = 5*60*1000;
 
@@ -213,7 +213,7 @@ Model.prototype = {
                 self._zeroEx.exchange.subscribeAsync("LogFill", {}, self.handleLogFillEvent.bind(self, null));
 
                 /* Fetch past fill logs */
-                self.fetchPastTrades(BLOCK_FETCH_COUNT);
+                self.fetchPastTradesDuration(86400);
               });
             }
           });
@@ -421,14 +421,42 @@ Model.prototype = {
     if (fromBlock < ZEROEX_GENESIS_BLOCK[this._networkId])
       fromBlock = ZEROEX_GENESIS_BLOCK[this._networkId];
 
+    this._oldestBlockFetched = fromBlock;
+
     var self = this;
-    this._zeroEx.exchange.getLogsAsync("LogFill", {fromBlock: fromBlock, toBlock: toBlock}, {}).then(function (logs) {
+    return this._zeroEx.exchange.getLogsAsync("LogFill", {fromBlock: fromBlock, toBlock: toBlock}, {}).then(function (logs) {
       for (var i = 0; i < logs.length; i++) {
         self.handleLogFillEvent(null, logs[i]);
       }
     });
+  },
 
-    this._oldestBlockFetched = fromBlock;
+  fetchPastTradesDuration: function (duration) {
+    var currentTimestamp = Math.round((new Date()).getTime() / 1000);
+
+    var oldestBlockFetchedTimestamp;
+
+    if (this._oldestBlockFetched) {
+      oldestBlockFetchedTimestamp = this.getBlockTimestamp(this._oldestBlockFetched);
+    } else {
+      oldestBlockFetchedTimestamp = currentTimestamp;
+    }
+
+    var self = this;
+    return Promise.resolve(oldestBlockFetchedTimestamp).then(function (timestamp) {
+      if ((currentTimestamp - timestamp) < duration) {
+        /* Fetch more */
+        return self.fetchPastTrades(BLOCK_FETCH_COUNT).then(function () {
+          return true;
+        });
+      } else {
+        /* All done! */
+        return false;
+      }
+    }).then(function (recheck) {
+      if (recheck)
+        return self.fetchPastTradesDuration(duration);
+    });
   },
 };
 
