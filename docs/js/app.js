@@ -545,16 +545,18 @@ View.prototype = {
     /* Normalize traded quantities */
     var makerQuantity = normalizeTokenQuantity(trade.makerToken, trade.filledMakerTokenAmount).toDigits(6);
     var takerQuantity = normalizeTokenQuantity(trade.takerToken, trade.filledTakerTokenAmount).toDigits(6);
-    var makerToken = this.formatTokenLink(trade.makerToken);
-    var takerToken = this.formatTokenLink(trade.takerToken);
+    var makerQuantityNormalized = !!ZEROEX_TOKEN_INFOS[trade.makerToken]
+    var takerQuantityNormalized = !!ZEROEX_TOKEN_INFOS[trade.takerToken]
+    var makerTokenLink = this.formatTokenLink(trade.makerToken);
+    var takerTokenLink = this.formatTokenLink(trade.takerToken);
 
     /* Format trade string */
     var swap = $("<span></span>")
-                .append($("<span></span>").text(makerQuantity + " "))
-                .append(makerToken)
+                .append($(makerQuantityNormalized ? "<span></span>" : "<i></i>").text(makerQuantity + " "))
+                .append(makerTokenLink)
                 .append($("<span></span>").text(" ↔ "))
-                .append($("<span></span>").text(takerQuantity + " "))
-                .append(takerToken);
+                .append($(takerQuantityNormalized ? "<span></span>" : "<i></i>").text(takerQuantity + " "))
+                .append(takerTokenLink);
 
     /* Compute price */
     var mtPrice = tmPrice = "Unknown";
