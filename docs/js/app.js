@@ -412,6 +412,11 @@ Model.prototype = {
       self.updateStatistics();
 
       setTimeout(self.updatePrices.bind(self), PRICE_UPDATE_TIMEOUT);
+    }).catch(function () {
+      Logger.error('[Model] Error fetching token prices');
+
+      Logger.log('[Model] Retrying in half update timeout');
+      setTimeout(self.updatePrices.bind(self), Math.floor(PRICE_UPDATE_TIMEOUT/2));
     });
   },
 
