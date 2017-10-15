@@ -902,6 +902,9 @@ View.prototype = {
     }
 
     /* Update data */
+    var currentTimestamp = moment();
+    this._priceCharts[index].chart.options.scales.xAxes[0].time.min = currentTimestamp.clone().subtract(STATISTICS_TIME_WINDOW, 's');
+    this._priceCharts[index].chart.options.scales.xAxes[0].time.max = currentTimestamp;
     this._priceCharts[index].chart.data.datasets[0].data = this._priceVolumeHistory.getPriceData(this._priceCharts[index].tokenPair);
     this._priceCharts[index].chart.update();
   },
