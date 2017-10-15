@@ -141,6 +141,7 @@ var Model = function (web3) {
   /* Model State */
   this._trades = [];
   this._tradesSeen = {};
+  this._initialFetchDone = false;
 
   /* Blockchain state */
   this._oldestBlockFetched = null;
@@ -215,7 +216,12 @@ Model.prototype = {
                 self._zeroEx.exchange.subscribeAsync("LogFill", {}, self.handleLogFillEvent.bind(self, null));
 
                 /* Fetch past fill logs */
-                self.fetchPastTradesDuration(86400);
+                self.fetchPastTradesDuration(STATISTICS_TIME_WINDOW).then(function () {
+                  self._initialFetchDone = true;
+
+                  /* Now, update the statistics */
+                  self.updateStatistics();
+                });
               });
             }
           });
@@ -300,6 +306,10 @@ Model.prototype = {
   /* Statistics update */
 
   updateStatistics: function () {
+    /* Hold off on updating statistics until we've fetched initial trades */
+    if (!this._initialFetchDone)
+      return;
+
     Logger.log('[Model] Updating statistics');
 
     var currentTimestamp = Math.round((new Date()).getTime() / 1000);
