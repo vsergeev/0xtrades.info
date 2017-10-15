@@ -112,12 +112,14 @@ h3:hover .header-link {
 
 #fetch-button {
   font-size: 1.0rem;
+  margin-bottom: 1rem;
 }
 
 /******************************************************************************/
 
 .canvas-wrapper {
   max-width: 80%;
+  margin-bottom: 1rem;
 }
 
 /******************************************************************************/
@@ -125,7 +127,7 @@ h3:hover .header-link {
 .footer {
   bottom: 0;
   width: 100%;
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .footer span {
