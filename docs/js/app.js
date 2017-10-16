@@ -116,15 +116,102 @@ var CURRENCY_MAP = {
 var CURRENCY_DEFAULT = "USD";
 
 /******************************************************************************/
-/* Helper Functions */
+/* Price/Volume History */
 /******************************************************************************/
 
-var normalizeTokenQuantity = function (token, quantity) {
-  if (ZEROEX_TOKEN_INFOS[token]) {
-    return quantity.div(10**ZEROEX_TOKEN_INFOS[token].decimals);
-  } else {
-    return quantity;
-  }
+var PriceVolumeHistory = function () {
+  /* State */
+  this.tokens = [];
+  this._priceData = {};
+  this._volumeData = {};
+  this._timestamps = {};
+};
+
+PriceVolumeHistory.prototype = {
+  /* Insert price data */
+  insert: function (maker, taker, timestamp, mtPrice, tmPrice, makerVolume, takerVolume) {
+    /* Initialize data structures */
+    this._initialize(maker, taker);
+    this._initialize(taker, maker);
+
+    /* Find index for this data */
+    var index = 0;
+    for (index = 0; index < this._timestamps[maker][taker].length; index++) {
+      if (this._timestamps[maker][taker][index] > timestamp)
+        break;
+    }
+
+    /* Create date object */
+    var date = new Date(timestamp*1000);
+
+    /* Save the timestamp and prices */
+    this._timestamps[maker][taker].splice(index, 0, timestamp);
+    this._timestamps[taker][maker].splice(index, 0, timestamp);
+    this._priceData[maker][taker].splice(index, 0, {x: date, y: mtPrice});
+    this._priceData[taker][maker].splice(index, 0, {x: date, y: tmPrice});
+    this._volumeData[maker][taker].splice(index, 0, {x: date, y: takerVolume});
+    this._volumeData[taker][maker].splice(index, 0, {x: date, y: makerVolume});
+  },
+
+  /* Get price data for a token pair */
+  getPriceData: function (tokenPair) {
+    var [quote, base] = tokenPair.split(":");
+
+    if (this._priceData[base] && this._priceData[base][quote])
+      return this._priceData[base][quote];
+
+    return [];
+  },
+
+  /* Get volume data for a token pair */
+  getVolumeData: function (tokenPair) {
+    var [quote, base] = tokenPair.split(":");
+
+    if (this._volumeData[base] && this._volumeData[base][quote])
+      return this._volumeData[base][quote];
+
+    return [];
+  },
+
+  /* Prune old data outside of statistics window */
+  prune: function () {
+    var currentTimestamp = Math.round((new Date()).getTime() / 1000);
+    var cutoffTimestamp = currentTimestamp - STATISTICS_TIME_WINDOW;
+
+    var pruned = false;
+
+    for (var maker in this._timestamps) {
+      for (var taker in this._timestamps) {
+        while (this._timestamps[maker][taker] && this._timestamps[maker][taker][0] < cutoffTimestamp) {
+          this._timestamps[maker][taker].shift();
+          this._timestamps[taker][maker].shift();
+          this._priceData[maker][taker].shift();
+          this._priceData[taker][maker].shift();
+          this._volumeData[maker][taker].shift();
+          this._volumeData[taker][maker].shift();
+          pruned = true;
+        }
+      }
+    }
+
+    return pruned;
+  },
+
+  /* Initialize state for maker/taker tokens a and b */
+  _initialize: function (a, b) {
+    if (this._priceData[a] === undefined) {
+      this._priceData[a] = {};
+      this._volumeData[a] = {};
+      this._timestamps[a] = {};
+    }
+    if (this._priceData[a][b] === undefined) {
+      this._priceData[a][b] = [];
+      this._volumeData[a][b] = [];
+      this._timestamps[a][b] = [];
+      this.tokens.push(a + ":" + b);
+      this.tokens.sort();
+    }
+  },
 };
 
 /******************************************************************************/
@@ -152,6 +239,7 @@ var Model = function (web3, currency) {
   /* Price state */
   this._tokenPrices = {};
   this._fiatCurrency = CURRENCY_MAP[currency] ? currency : CURRENCY_DEFAULT;
+  this._priceVolumeHistory = new PriceVolumeHistory();
 
   /* Callbacks */
   this.connectedCallback = null;
@@ -264,18 +352,38 @@ Model.prototype = {
         var trade = {
           txid: result.transactionHash,
           blockNumber: web3.toDecimal(result.blockNumber),
-          taker: result.args.taker,
+          takerAddress: result.args.taker,
+          makerAddress: result.args.maker,
+          relayAddress: result.args.feeRecipient,
           takerToken: result.args.takerToken,
-          maker: result.args.maker,
           makerToken: result.args.makerToken,
-          filledMakerTokenAmount: result.args.filledMakerTokenAmount,
-          filledTakerTokenAmount: result.args.filledTakerTokenAmount,
-          feeRecipient: result.args.feeRecipient,
-          paidMakerFee: result.args.paidMakerFee,
-          paidTakerFee: result.args.paidTakerFee,
-          tokens: result.args.tokens,
+          makerVolume: result.args.filledMakerTokenAmount,
+          takerVolume: result.args.filledTakerTokenAmount,
+          makerFee: result.args.paidMakerFee,
+          takerFee: result.args.paidTakerFee,
           orderHash: result.args.orderHash,
+          mtPrice: null,
+          tmPrice: null,
+          makerNormalized: false,
+          takerNormalized: false,
         };
+
+        /* Normalize traded volueme and fee quantities */
+        [trade.makerVolume, trade.makerNormalized] = this.normalizeQuantity(trade.makerToken, trade.makerVolume);
+        [trade.takerVolume, trade.takerNormalized] = this.normalizeQuantity(trade.takerToken, trade.takerVolume);
+        [trade.makerFee, ] = this.normalizeQuantity(ZEROEX_TOKEN_ADDRESS, trade.makerFee);
+        [trade.takerFee, ] = this.normalizeQuantity(ZEROEX_TOKEN_ADDRESS, trade.takerFee);
+
+        /* Compute prices */
+        if (trade.makerNormalized && trade.takerNormalized) {
+          trade.mtPrice = trade.makerVolume.div(trade.takerVolume);
+          trade.tmPrice = trade.takerVolume.div(trade.makerVolume);
+        } else if (trade.makerVolume.eq(trade.takerVolume)) {
+          /* Special case of equal maker/take quantities doesn't require token
+           * decimals */
+          trade.mtPrice = new web3.BigNumber(1);
+          trade.tmPrice = new web3.BigNumber(1);
+        }
 
         /* Mark this trade as seen */
         this._tradesSeen[result.transactionHash + result.logIndex] = true;
@@ -293,6 +401,16 @@ Model.prototype = {
           }
           self._trades.splice(index, 0, trade);
 
+          /* Update our price history for this token pair */
+          if (trade.makerNormalized && trade.takerNormalized) {
+            self._priceVolumeHistory.insert(ZEROEX_TOKEN_INFOS[trade.makerToken].symbol,
+                                            ZEROEX_TOKEN_INFOS[trade.takerToken].symbol,
+                                            trade.timestamp,
+                                            trade.mtPrice.toNumber(), trade.tmPrice.toNumber(),
+                                            trade.makerVolume.toNumber(), trade.takerVolume.toNumber());
+          }
+
+          /* Call view callback */
           self.newTradeCallback(trade);
 
           /* Update statistics */
@@ -323,14 +441,14 @@ Model.prototype = {
 
       /*** Relay fee statistics ***/
 
-      var relay = this._trades[i].feeRecipient;
-      var relayFee = normalizeTokenQuantity(ZEROEX_TOKEN_ADDRESS, this._trades[i].paidMakerFee.add(this._trades[i].paidTakerFee));
+      var relayAddress = this._trades[i].relayAddress;
+      var relayFee = this._trades[i].makerFee.add(this._trades[i].takerFee);
 
-      if (feeStats.relays[relay] == undefined)
-        feeStats.relays[relay] = new web3.BigNumber(0);
+      if (feeStats.relays[relayAddress] == undefined)
+        feeStats.relays[relayAddress] = new web3.BigNumber(0);
 
       /* Fee per relay and total relay fees */
-      feeStats.relays[relay] = feeStats.relays[relay].add(relayFee);
+      feeStats.relays[relayAddress] = feeStats.relays[relayAddress].add(relayFee);
       feeStats.totalFees = feeStats.totalFees.add(relayFee);
 
       /* Fee vs Feeless trade count */
@@ -343,8 +461,10 @@ Model.prototype = {
 
       var makerToken = this._trades[i].makerToken;
       var takerToken = this._trades[i].takerToken;
-      var makerVolume = normalizeTokenQuantity(makerToken, this._trades[i].filledMakerTokenAmount);
-      var takerVolume = normalizeTokenQuantity(takerToken, this._trades[i].filledTakerTokenAmount);
+      var makerVolume = this._trades[i].makerVolume;
+      var takerVolume = this._trades[i].takerVolume;
+      var makerTokenSymbol = this._trades[i].makerNormalized ? ZEROEX_TOKEN_INFOS[makerToken].symbol : null;
+      var takerTokenSymbol = this._trades[i].takerNormalized ? ZEROEX_TOKEN_INFOS[takerToken].symbol : null;
 
       if (volumeStats.tokens[makerToken] == undefined)
         volumeStats.tokens[makerToken] = {volume: new web3.BigNumber(0), volumeFiat: new web3.BigNumber(0), count: 0};
@@ -356,15 +476,11 @@ Model.prototype = {
       volumeStats.tokens[takerToken].volume = volumeStats.tokens[takerToken].volume.add(takerVolume);
 
       /* Fiat volume per token */
-      var makerTokenSymbol = ZEROEX_TOKEN_INFOS[makerToken] && ZEROEX_TOKEN_INFOS[makerToken].symbol || null;
-      var takerTokenSymbol = ZEROEX_TOKEN_INFOS[takerToken] && ZEROEX_TOKEN_INFOS[takerToken].symbol || null;
-
       if (this._tokenPrices[makerTokenSymbol]) {
         var fiatMakerVolume = makerVolume.mul(this._tokenPrices[makerTokenSymbol]);
         volumeStats.tokens[makerToken].volumeFiat = volumeStats.tokens[makerToken].volumeFiat.add(fiatMakerVolume);
         volumeStats.totalVolumeFiat = volumeStats.totalVolumeFiat.add(fiatMakerVolume);
       }
-
       if (this._tokenPrices[takerTokenSymbol]) {
         var fiatTakerVolume = takerVolume.mul(this._tokenPrices[takerTokenSymbol]);
         volumeStats.tokens[takerToken].volumeFiat = volumeStats.tokens[takerToken].volumeFiat.add(fiatTakerVolume);
@@ -372,8 +488,8 @@ Model.prototype = {
       }
 
       /* Trade count per token and total trades */
-      volumeStats.tokens[this._trades[i].makerToken].count += 1;
-      volumeStats.tokens[this._trades[i].takerToken].count += 1;
+      volumeStats.tokens[makerToken].count += 1;
+      volumeStats.tokens[takerToken].count += 1;
       volumeStats.totalTrades += 1;
     }
 
@@ -382,10 +498,14 @@ Model.prototype = {
     feeStats.totalFeesFiat = zrxPrice ? feeStats.totalFees.mul(zrxPrice) : null;
     feeStats.fiatCurrency = this._fiatCurrency;
 
-    this.statisticsUpdatedCallback(feeStats, volumeStats);
+    /* Prune price/volume history */
+    this._priceVolumeHistory.prune();
+
+    /* Call view callback */
+    this.statisticsUpdatedCallback(feeStats, volumeStats, this._priceVolumeHistory);
   },
 
-  /* Price table update */
+  /* Update fiat token prices */
 
   updatePrices: function () {
     Logger.log('[Model] Fetching token prices');
@@ -402,6 +522,7 @@ Model.prototype = {
       Logger.log('[Model] Got token prices');
       Logger.log(prices);
 
+      /* Extract prices */
       for (var token in prices)
         self._tokenPrices[token] = prices[token][self._fiatCurrency];
 
@@ -411,6 +532,7 @@ Model.prototype = {
       /* Update statistics */
       self.updateStatistics();
 
+      /* Set up next update */
       setTimeout(self.updatePrices.bind(self), PRICE_UPDATE_TIMEOUT);
     }).catch(function () {
       Logger.error('[Model] Error fetching token prices');
@@ -418,6 +540,15 @@ Model.prototype = {
       Logger.log('[Model] Retrying in half update timeout');
       setTimeout(self.updatePrices.bind(self), Math.floor(PRICE_UPDATE_TIMEOUT/2));
     });
+  },
+
+  /* Token quantity normalization helper function */
+
+  normalizeQuantity: function (token, quantity) {
+    if (ZEROEX_TOKEN_INFOS[token])
+      return [quantity.div(10**ZEROEX_TOKEN_INFOS[token].decimals), true];
+    else
+      return [quantity, false];
   },
 
   /* Operations */
@@ -473,104 +604,9 @@ Model.prototype = {
         return self.fetchPastTradesDuration(duration);
     });
   },
-};
 
-/******************************************************************************/
-/* Price History */
-/******************************************************************************/
-
-var PriceVolumeHistory = function () {
-  /* State */
-  this.tokens = [];
-  this._priceData = {};
-  this._volumeData = {};
-  this._timestamps = {};
-};
-
-PriceVolumeHistory.prototype = {
-  /* Insert price data */
-  insert: function (maker, taker, timestamp, mtPrice, tmPrice, makerVolume, takerVolume) {
-    /* Initialize data structures */
-    this._initialize(maker, taker);
-    this._initialize(taker, maker);
-
-    /* Find index for this data */
-    var index = 0;
-    for (index = 0; index < this._timestamps[maker][taker].length; index++) {
-      if (this._timestamps[maker][taker][index] > timestamp)
-        break;
-    }
-
-    /* Create date object */
-    var date = new Date(timestamp*1000);
-
-    /* Save the timestamp and prices */
-    this._timestamps[maker][taker].splice(index, 0, timestamp);
-    this._timestamps[taker][maker].splice(index, 0, timestamp);
-    this._priceData[maker][taker].splice(index, 0, {x: date, y: mtPrice});
-    this._priceData[taker][maker].splice(index, 0, {x: date, y: tmPrice});
-    this._volumeData[maker][taker].splice(index, 0, {x: date, y: takerVolume});
-    this._volumeData[taker][maker].splice(index, 0, {x: date, y: makerVolume});
-  },
-
-  /* Get price data for a token pair */
-  getPriceData: function (tokenPair) {
-    var [quote, base] = tokenPair.split(":");
-
-    if (this._priceData[base] && this._priceData[base][quote])
-      return this._priceData[base][quote];
-
-    return [];
-  },
-
-  /* Get volume data for a token pair */
-  getVolumeData: function (tokenPair) {
-    var [quote, base] = tokenPair.split(":");
-
-    if (this._volumeData[base] && this._volumeData[base][quote])
-      return this._volumeData[base][quote];
-
-    return [];
-  },
-
-  /* Prune old data outside of statistics window */
-  prune: function () {
-    var currentTimestamp = Math.round((new Date()).getTime() / 1000);
-    var cutoffTimestamp = currentTimestamp - STATISTICS_TIME_WINDOW;
-
-    var pruned = false;
-
-    for (var maker in this._timestamps) {
-      for (var taker in this._timestamps) {
-        while (this._timestamps[maker][taker] && this._timestamps[maker][taker][0] < cutoffTimestamp) {
-          this._timestamps[maker][taker].shift();
-          this._timestamps[taker][maker].shift();
-          this._priceData[maker][taker].shift();
-          this._priceData[taker][maker].shift();
-          this._volumeData[maker][taker].shift();
-          this._volumeData[taker][maker].shift();
-          pruned = true;
-        }
-      }
-    }
-
-    return pruned;
-  },
-
-  /* Initialize state for maker/taker tokens a and b */
-  _initialize: function (a, b) {
-    if (this._priceData[a] === undefined) {
-      this._priceData[a] = {};
-      this._volumeData[a] = {};
-      this._timestamps[a] = {};
-    }
-    if (this._priceData[a][b] === undefined) {
-      this._priceData[a][b] = [];
-      this._volumeData[a][b] = [];
-      this._timestamps[a][b] = [];
-      this.tokens.push(a + ":" + b);
-      this.tokens.sort();
-    }
+  getPriceVolumeHistory: function () {
+    return this._priceVolumeHistory;
   },
 };
 
@@ -586,10 +622,10 @@ var View = function () {
   this._trades = [];
   this._priceInverted = false;
   this._priceCharts = [];
-  this._priceVolumeHistory = new PriceVolumeHistory();
 
   /* Callbacks */
   this.fetchMoreCallback = null;
+  this.getPriceVolumeHistoryCallback = null
 };
 
 View.prototype = {
@@ -692,57 +728,24 @@ View.prototype = {
     /* Format time stamp */
     var timestamp = this.formatDateTime(new Date(trade.timestamp*1000));
 
-    /* Normalize traded quantities */
-    var makerQuantity = normalizeTokenQuantity(trade.makerToken, trade.filledMakerTokenAmount);
-    var takerQuantity = normalizeTokenQuantity(trade.takerToken, trade.filledTakerTokenAmount);
-    var makerQuantityNormalized = !!ZEROEX_TOKEN_INFOS[trade.makerToken];
-    var takerQuantityNormalized = !!ZEROEX_TOKEN_INFOS[trade.takerToken];
-    var makerTokenLink = this.formatTokenLink(trade.makerToken);
-    var takerTokenLink = this.formatTokenLink(trade.takerToken);
-    var makerTokenSymbol = ZEROEX_TOKEN_INFOS[trade.makerToken] && ZEROEX_TOKEN_INFOS[trade.makerToken].symbol;
-    var takerTokenSymbol = ZEROEX_TOKEN_INFOS[trade.takerToken] && ZEROEX_TOKEN_INFOS[trade.takerToken].symbol;
-
     /* Format trade string */
     var swap = $("<span></span>")
-                .append($(makerQuantityNormalized ? "<span></span>" : "<i></i>").text(makerQuantity.toDigits(6) + " "))
-                .append(makerTokenLink)
+                .append($(trade.makerNormalized ? "<span></span>" : "<i></i>").text(trade.makerVolume.toDigits(6) + " "))
+                .append(this.formatTokenLink(trade.makerToken))
                 .append($("<span></span>").text(" ↔ "))
-                .append($(takerQuantityNormalized ? "<span></span>" : "<i></i>").text(takerQuantity.toDigits(6) + " "))
-                .append(takerTokenLink);
+                .append($(trade.takerNormalized ? "<span></span>" : "<i></i>").text(trade.takerVolume.toDigits(6) + " "))
+                .append(this.formatTokenLink(trade.takerToken));
 
-    /* Compute price */
-    var mtPrice = tmPrice = "Unknown";
-    if (makerTokenSymbol && takerTokenSymbol) {
-      mtPrice = makerQuantity.div(takerQuantity);
-      tmPrice = takerQuantity.div(makerQuantity);
-
-      /* Update our price history for this token pair */
-      this._priceVolumeHistory.insert(makerTokenSymbol, takerTokenSymbol, trade.timestamp,
-                                      mtPrice.toNumber(), tmPrice.toNumber(),
-                                      makerQuantity.toNumber(), takerQuantity.toNumber());
-
-      mtPrice = mtPrice.toDigits(6);
-      tmPrice = tmPrice.toDigits(6);
-    } else if (makerQuantity.eq(takerQuantity)) {
-      /* Special case of equal maker/take quantities doesn't require token
-       * decimals */
-      mtPrice = 1;
-      tmPrice = 1;
-    }
-
+    /* Format price */
     var price = $("<span></span>")
                   .append($("<span></span>")
                             .toggle(!this._priceInverted)
                             .addClass("m_t")
-                            .text(mtPrice))
+                            .text(trade.mtPrice ? trade.mtPrice.toDigits(6) : "Unknown"))
                   .append($("<span></span>")
                             .toggle(this._priceInverted)
                             .addClass("t_m")
-                            .text(tmPrice));
-
-    /* Format maker and taker fees */
-    var makerFee = normalizeTokenQuantity(ZEROEX_TOKEN_ADDRESS, trade.paidMakerFee).toDigits(6) + " ZRX";
-    var takerFee = normalizeTokenQuantity(ZEROEX_TOKEN_ADDRESS, trade.paidTakerFee).toDigits(6) + " ZRX";
+                            .text(trade.tmPrice ? trade.tmPrice.toDigits(6) : "Unknown"));
 
     /* Create row for trade list */
     var elem = $('<tr></tr>')
@@ -756,13 +759,13 @@ View.prototype = {
                 .append($('<td></td>')      /* Price */
                           .html(price))
                 .append($('<td></td>')      /* Relay Address */
-                          .html(this.formatRelayLink(trade.feeRecipient)))
+                          .html(this.formatRelayLink(trade.relayAddress)))
                 .append($('<td></td>')      /* Maker Fee */
                           .addClass('overflow-sm')
-                          .text(makerFee))
+                          .text(trade.makerFee.toDigits(6) + " ZRX"))
                 .append($('<td></td>')      /* Taker Fee */
                           .addClass('overflow-sm')
-                          .text(takerFee));
+                          .text(trade.takerFee.toDigits(6) + " ZRX"));
 
     /* Add to trade list */
     if (this._trades.length == 1)
@@ -771,10 +774,11 @@ View.prototype = {
       $('#trade-list').find("tr").eq(index).after(elem);
   },
 
-  handleStatisticsUpdatedEvent: function (feeStats, volumeStats) {
+  handleStatisticsUpdatedEvent: function (feeStats, volumeStats, priceVolumeHistory) {
     Logger.log('[View] Got Statistics Updated Event');
     Logger.log(feeStats);
     Logger.log(volumeStats);
+    Logger.log(priceVolumeHistory);
 
     /* Clear current volumes */
     $('#volume').find("tr").remove();
@@ -878,28 +882,27 @@ View.prototype = {
     this._feeChart.data.datasets[0].data = [feeStats.feeCount, feeStats.feelessCount];
     this._feeChart.update();
 
-    /* Prune price/volume history */
-    this._priceVolumeHistory.prune();
-
     /* Update price charts */
     for (var i = 0; i < this._priceCharts.length; i++)
       this.updatePriceChart(i);
   },
 
   updatePriceChart: function (index) {
+    var priceVolumeHistory = this.getPriceVolumeHistoryCallback();
+
     /* Update selected token pair */
     $('#price-chart-pair-text-' + index).text(this._priceCharts[index].tokenPair);
 
     /* Update token pair list */
     var self = this;
     $('#price-chart-pair-list-' + index).find("li").remove();
-    for (var j = 0; j < this._priceVolumeHistory.tokens.length; j++) {
+    for (var j = 0; j < priceVolumeHistory.tokens.length; j++) {
       $('#price-chart-pair-list-' + index).append(
         $("<li></li>")
           .append($("<a></a>")
-                    .text(this._priceVolumeHistory.tokens[j])
+                    .text(priceVolumeHistory.tokens[j])
                     .attr('href', '#')
-                    .on('click', {index: index, pair: this._priceVolumeHistory.tokens[j]}, function (e) {
+                    .on('click', {index: index, pair: priceVolumeHistory.tokens[j]}, function (e) {
                       e.preventDefault();
                       self.handleSelectPriceChartTokenPair(e.data.index, e.data.pair);
                     }))
@@ -910,7 +913,7 @@ View.prototype = {
     var currentTimestamp = moment();
     this._priceCharts[index].chart.options.scales.xAxes[0].time.min = currentTimestamp.clone().subtract(STATISTICS_TIME_WINDOW, 's');
     this._priceCharts[index].chart.options.scales.xAxes[0].time.max = currentTimestamp;
-    this._priceCharts[index].chart.data.datasets[0].data = this._priceVolumeHistory.getPriceData(this._priceCharts[index].tokenPair);
+    this._priceCharts[index].chart.data.datasets[0].data = priceVolumeHistory.getPriceData(this._priceCharts[index].tokenPair);
     this._priceCharts[index].chart.update();
   },
 
@@ -1110,6 +1113,7 @@ Controller.prototype = {
 
     /* Bind view -> model */
     this.view.fetchMoreCallback = this.model.fetchPastTrades.bind(this.model);
+    this.view.getPriceVolumeHistoryCallback = this.model.getPriceVolumeHistory.bind(this.model);
 
     /* Initialize view */
     this.view.init();
