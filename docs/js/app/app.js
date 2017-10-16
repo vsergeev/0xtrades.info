@@ -99,6 +99,4 @@ App = {
   },
 };
 
-window.onload = function () {
-  App.init();
-}
+window.onload = App.init;
