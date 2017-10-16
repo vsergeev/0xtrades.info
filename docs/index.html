@@ -12,6 +12,13 @@
   <div class="container">
     <div class="row">
       <h1>0x Trade Viewer</h1>
+      <div class="dropdown-right">
+        <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="currency-dropdown" data-toggle="dropdown" aria-haspopup="true">
+          <span id="currency-dropdown-text"></span>
+          <span class="caret"></span>
+        </button>
+        <ul id="currency-dropdown-list" class="dropdown-menu" aria-labelledby="currency-dropdown"></ul>
+      </div>
     </div>
     <div class="row">
       <p class="description">A real-time trade viewer for the <a href="https://0xproject.com/" target="_blank">0x protocol</a>.</p>
@@ -23,13 +30,6 @@
     <div class="row">
       <span class="anchor" id="volume-24hr"></span>
       <h3>Volume (24 hr)<a class="header-link" href="#volume-24hr"><i class="icon-link"></i></a></h3>
-      <div class="dropdown-right">
-        <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="currency-dropdown" data-toggle="dropdown" aria-haspopup="true">
-          <span id="currency-dropdown-text"></span>
-          <span class="caret"></span>
-        </button>
-        <ul id="currency-dropdown-list" class="dropdown-menu" aria-labelledby="currency-dropdown"></ul>
-      </div>
     </div>
     <div class="row">
       <table id="volume" class="table table-condensed table-sm borderless">
