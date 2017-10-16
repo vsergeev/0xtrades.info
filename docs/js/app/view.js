@@ -35,6 +35,7 @@ var View = function () {
   this._trades = [];
   this._priceInverted = false;
   this._priceCharts = [];
+  this._panels = [];
 
   /* Callbacks */
   this.fetchMoreCallback = null;
@@ -353,6 +354,10 @@ View.prototype = {
     this.updatePriceChart(index);
   },
 
+  handleAddPanelRow: function () {
+    this.panelCreate(this.domAddPanelRow(), EmptyPanel);
+  },
+
   /* Price charts */
 
   addPriceChartToDom: function () {
@@ -403,6 +408,41 @@ View.prototype = {
     var priceChart = new Chart($("#price-chart-" + index)[0].getContext('2d'), priceChartConfig);
 
     this._priceCharts.push({index: index, tokenPair: PRICE_CHART_DEFAULT_PAIR, chart: priceChart});
+  },
+
+  /* Panel management */
+
+  domAddPanelRow: function () {
+    var panel = $('<div></div>').addClass('panel');
+    $('.row').last().after(row);
+    return panel;
+  },
+
+  domSplitPanelRow: function (dom) {
+    var panel1 = $('<div></div>').addClass('panel');
+    var panel2 = $('<div></div>').addClass('panel');
+    var row = $('<div></div>')
+                .addClass('row')
+                .append($('<div></div>')
+                          .addClass('col-sm-6')
+                          .append(panel1))
+                .append($('<div></div>')
+                          .addClass('col-sm-6')
+                          .append(panel2));
+    dom.append(row);
+    return [panel1, panel2];
+  },
+
+  panelCreate: function (dom, cls) {
+    var panel = new cls(this);
+    panel.create(dom);
+    panel.initialize();
+    this._panels.push(panel);
+  },
+
+  panelRemove: function (panel) {
+    panel.destroy();
+    this._panels.splice(this._panels.indexOf(panel), 1);
   },
 
   /* Formatting Helpers */
