@@ -120,14 +120,12 @@ var FIAT_CURRENCY_DEFAULT = "USD";
 /******************************************************************************/
 
 Logger = {
-  enabled: false,
+  enable: function () { Logger.log = Logger._log_console; },
+  disable: function () { Logger.log = Logger._log_null; },
 
-  log: function (s) {
-    if (Logger.enabled && console)
-      console.log(s);
-  },
+  _log_console: console.log.bind(window.console),
+  _log_null: function (s) { },
 
-  error: function (s) {
-    console.error(s);
-  },
+  log: null,
+  error: console.error.bind(window.console),
 };

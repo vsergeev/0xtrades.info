@@ -70,7 +70,9 @@ App = {
 
     /* Enable logging in debug mode */
     if (params.has("debug"))
-      Logger.enabled = true;
+      Logger.enable();
+    else
+      Logger.disable();
 
     /* Look up currency */
     var currency = params.get("cur");
