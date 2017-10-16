@@ -75,7 +75,7 @@ var PRICE_UPDATE_TIMEOUT = 5*60*1000;
 var PRICE_CHART_DEFAULT_PAIR = "ZRX:WETH";
 
 /* From http://www.localeplanet.com/api/auto/currencymap.json */
-var CURRENCY_MAP = {
+var FIAT_CURRENCY_MAP = {
   "USD": {
     "symbol": "$",
     "symbol_native": "$",
@@ -113,7 +113,7 @@ var CURRENCY_MAP = {
   },
 };
 
-var CURRENCY_DEFAULT = "USD";
+var FIAT_CURRENCY_DEFAULT = "USD";
 
 /******************************************************************************/
 /* Price/Volume History */
@@ -218,7 +218,7 @@ PriceVolumeHistory.prototype = {
 /* Model */
 /******************************************************************************/
 
-var Model = function (web3, currency) {
+var Model = function (web3, fiatCurrency) {
   /* web3 interface */
   this._web3 = web3;
   this._zeroEx = new ZeroEx.ZeroEx(web3.currentProvider);
@@ -238,7 +238,7 @@ var Model = function (web3, currency) {
 
   /* Price state */
   this._tokenPrices = {};
-  this._fiatCurrency = CURRENCY_MAP[currency] ? currency : CURRENCY_DEFAULT;
+  this._fiatCurrency = FIAT_CURRENCY_MAP[fiatCurrency] ? fiatCurrency : FIAT_CURRENCY_DEFAULT;
   this._priceVolumeHistory = new PriceVolumeHistory();
 
   /* Callbacks */
@@ -264,7 +264,7 @@ Model.prototype = {
         if (ZEROEX_GENESIS_BLOCK[self._networkId] == undefined) {
           Logger.log('[Model] Unsupported network id');
 
-          self.connectedCallback(self._networkId, false);
+          self.connectedCallback(self._networkId, self._fiatCurrency, false);
         } else {
           self._web3.eth.getBlockNumber(function (error, result) {
             if (error) {
@@ -279,7 +279,7 @@ Model.prototype = {
               self._zeroEx.exchange.getContractAddressAsync().then(function (address) {
                 ZEROEX_EXCHANGE_ADDRESS = address;
 
-                self.connectedCallback(self._networkId, true);
+                self.connectedCallback(self._networkId, self._fiatCurrency, true);
 
                 /* Fetch token registry */
                 return self._zeroEx.tokenRegistry.getTokensAsync();
@@ -674,8 +674,8 @@ View.prototype = {
     this._tokensVolumeChart = new Chart($("#tokens-volume-chart")[0].getContext('2d'), tokensVolumeChartConfig);
 
     var searchParams = new URLSearchParams(window.location.search);
-    for (var key in CURRENCY_MAP) {
-      var text = CURRENCY_MAP[key].symbol + " " + key;
+    for (var key in FIAT_CURRENCY_MAP) {
+      var text = FIAT_CURRENCY_MAP[key].symbol + " " + key;
       searchParams.set('cur', key);
       $('#currency-dropdown-list').append($("<li></li>").append($("<a></a>").attr("href", "?" + searchParams.toString()).text(text)));
     }
@@ -686,9 +686,9 @@ View.prototype = {
 
   /* Event update handlers */
 
-  handleConnectedEvent: function (networkId, supported) {
+  handleConnectedEvent: function (networkId, fiatCurrency, supported) {
     Logger.log('[View] Got Connected Event');
-    Logger.log('[View] Network ID: ' + networkId + " Supported: " + supported);
+    Logger.log('[View] Network ID: ' + networkId + ' Currency: ' + fiatCurrency + ' Supported: ' + supported);
 
     this._networkId = networkId;
 
@@ -711,6 +711,9 @@ View.prototype = {
 
       this.showResultModal(false, "Unsupported network", "This network is unsupported.<br><br>Please switch to Mainnet or Kovan.");
     }
+
+    /* Update selected currency text */
+    $('#currency-dropdown-text').text(FIAT_CURRENCY_MAP[fiatCurrency].symbol + " " + fiatCurrency);
   },
 
   handleNewTradeEvent: function (trade) {
@@ -783,11 +786,8 @@ View.prototype = {
     /* Clear current volumes */
     $('#volume').find("tr").remove();
 
-    /* Update currency */
-    /* FIXME should we pass fiat currency in the connected event and do this
-     * once on init? */
-    var currencyInfo = CURRENCY_MAP[feeStats.fiatCurrency];
-    $('#currency-dropdown-text').text(currencyInfo.symbol + " " + feeStats.fiatCurrency);
+    /* Look up currency information */
+    var currencyInfo = FIAT_CURRENCY_MAP[feeStats.fiatCurrency];
 
     /* Aggregate fiat volume */
     if (volumeStats.totalVolumeFiat.gt(0)) {
