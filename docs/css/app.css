@@ -1,3 +1,5 @@
+/* Common */
+
 body {
   padding-top: 3rem;
   padding-bottom: 1.5rem;
@@ -23,20 +25,6 @@ h3 {
   margin-top: -1.5rem;
 }
 
-.header-link {
-  font-size: 1rem;
-  line-height: 1rem;
-  vertical-align: middle;
-}
-
-.header-link {
-  opacity: 0;
-}
-
-h3:hover .header-link {
-  opacity: 1;
-}
-
 .mono {
   font-family: monospace, monospace;
   font-size: 1.0rem;
@@ -47,7 +35,14 @@ h3:hover .header-link {
   margin-right: auto;
 }
 
+.canvas-wrapper {
+  max-width: 80%;
+  margin-bottom: 1rem;
+}
+
 /******************************************************************************/
+
+/* Description */
 
 .description {
   font-weight: 300;
@@ -56,18 +51,7 @@ h3:hover .header-link {
 
 /******************************************************************************/
 
-#volume th {
-  white-space: pre;
-  padding-right: 0.8rem;
-}
-
-#volume td {
-  width: 100%;
-}
-
-#volume {
-  margin-bottom: 0;
-}
+/* Dropdown menus */
 
 .dropdown-right {
   margin: auto 0 1rem auto;
@@ -89,49 +73,98 @@ h3:hover .header-link {
 
 /******************************************************************************/
 
-#trade-list, #trade-list .mono {
+/* Panel Controls */
+
+.panel-controls-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.panel-controls {
+  right: 1rem;
+  top: 1.2rem;
+  position: absolute;
+}
+
+.panel-header-link {
+  font-size: 1rem;
+  line-height: 1rem;
+  opacity: 0;
+}
+
+div.panel-header:hover .panel-header-link {
+  opacity: 1;
+}
+
+.panel-close {
+  font-size: 1rem;
+  line-height: 1rem;
+  opacity: 0;
+}
+
+div.panel-header:hover .panel-close {
+  opacity: 1;
+}
+
+/******************************************************************************/
+
+/* VolumeStatisticsPanel */
+
+.volume-statistics th {
+  white-space: pre;
+  padding-right: 0.8rem;
+}
+
+.volume-statistics td {
+  width: 100%;
+}
+
+.volume-statistics {
+  margin-bottom: 0;
+}
+
+/******************************************************************************/
+
+/* RecentTradesPanel */
+
+.recent-trades, .recent-trades .mono {
   font-size: 0.8rem;
 }
 
-#trade-list table {
+.recent-trades table {
   margin-bottom: 0.5rem;
 }
 
-#trade-list th, #trade-list td {
+.recent-trades th, .recent-trades td {
   white-space: nowrap;
 }
 
-#trade-list .overflow {
+.recent-trades .overflow {
   max-width: 250px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-#trade-list .overflow-sm {
+.recent-trades .overflow-sm {
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-#price-invert {
+.recent-trades .price-invert {
   cursor: pointer;
 }
 
-#fetch-button {
+.recent-trades-fetch-more {
   font-size: 1.0rem;
   margin-bottom: 1rem;
 }
 
 /******************************************************************************/
 
-.canvas-wrapper {
-  max-width: 80%;
-  margin-bottom: 1rem;
-}
-
-/******************************************************************************/
+/* Footer */
 
 .footer {
   bottom: 0;
@@ -144,6 +177,8 @@ h3:hover .header-link {
 }
 
 /******************************************************************************/
+
+/* Status Bar */
 
 #status-bar {
   position: fixed;

@@ -74,6 +74,17 @@ var PRICE_UPDATE_TIMEOUT = 5*60*1000;
 
 var PRICE_CHART_DEFAULT_PAIR = "ZRX:WETH";
 
+var CHART_DEFAULT_COLORS = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a',
+                            '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94',
+                            '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d',
+                            '#17becf', '#9edae5'];
+
+var CHART_DEFAULT_TOOLTIP_CALLBACK = function (item, data) {
+  var label = data.labels[item.index];
+  var value = data.datasets[item.datasetIndex].tooltips[item.index] || data.datasets[item.datasetIndex].data[item.index];
+  return label + ": " + value;
+};
+
 /* From http://www.localeplanet.com/api/auto/currencymap.json */
 var FIAT_CURRENCY_MAP = {
   "USD": {
