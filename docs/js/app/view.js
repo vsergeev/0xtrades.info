@@ -99,14 +99,13 @@ View.prototype = {
       this._panels[i].handleNewTradeEvent(index, trade, tradeHistory);
   },
 
-  handleStatisticsUpdatedEvent: function (feeStats, volumeStats, priceVolumeHistory) {
+  handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
     Logger.log('[View] Got Statistics Updated Event');
-    Logger.log(feeStats);
-    Logger.log(volumeStats);
+    Logger.log(statistics);
     Logger.log(priceVolumeHistory);
 
     for (var i = 0; i < this._panels.length; i++)
-      this._panels[i].handleStatisticsUpdatedEvent(feeStats, volumeStats, priceVolumeHistory);
+      this._panels[i].handleStatisticsUpdatedEvent(statistics, priceVolumeHistory);
   },
 
   /* Button handlers */

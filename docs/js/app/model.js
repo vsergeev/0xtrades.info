@@ -240,8 +240,10 @@ Model.prototype = {
     var currentTimestamp = Math.round((new Date()).getTime() / 1000);
     var cutoffTimestamp = currentTimestamp - STATISTICS_TIME_WINDOW;
 
-    var feeStats = {totalFees: new web3.BigNumber(0), relays: {}, feeCount: 0, feelessCount: 0};
-    var volumeStats = {totalTrades: 0, totalVolumeFiat: new web3.BigNumber(0), tokens: {}};
+    var statistics = {
+        'fees': {totalFees: new web3.BigNumber(0), relays: {}, feeCount: 0, feelessCount: 0},
+        'volume': {totalTrades: 0, totalVolumeFiat: new web3.BigNumber(0), tokens: {}},
+    };
 
     for (var i = 0; i < this._trades.length; i++) {
       /* Process up to statistics time window trades */
@@ -253,18 +255,18 @@ Model.prototype = {
       var relayAddress = this._trades[i].relayAddress;
       var relayFee = this._trades[i].makerFee.add(this._trades[i].takerFee);
 
-      if (feeStats.relays[relayAddress] == undefined)
-        feeStats.relays[relayAddress] = new web3.BigNumber(0);
+      if (statistics['fees'].relays[relayAddress] == undefined)
+        statistics['fees'].relays[relayAddress] = new web3.BigNumber(0);
 
       /* Fee per relay and total relay fees */
-      feeStats.relays[relayAddress] = feeStats.relays[relayAddress].add(relayFee);
-      feeStats.totalFees = feeStats.totalFees.add(relayFee);
+      statistics['fees'].relays[relayAddress] = statistics['fees'].relays[relayAddress].add(relayFee);
+      statistics['fees'].totalFees = statistics['fees'].totalFees.add(relayFee);
 
       /* Fee vs Feeless trade count */
       if (!relayFee.eq(0))
-        feeStats.feeCount += 1;
+        statistics['fees'].feeCount += 1;
       else
-        feeStats.feelessCount += 1;
+        statistics['fees'].feelessCount += 1;
 
       /*** Token volume and count statistics ***/
 
@@ -275,43 +277,43 @@ Model.prototype = {
       var makerTokenSymbol = this._trades[i].makerNormalized ? ZEROEX_TOKEN_INFOS[makerToken].symbol : null;
       var takerTokenSymbol = this._trades[i].takerNormalized ? ZEROEX_TOKEN_INFOS[takerToken].symbol : null;
 
-      if (volumeStats.tokens[makerToken] == undefined)
-        volumeStats.tokens[makerToken] = {volume: new web3.BigNumber(0), volumeFiat: new web3.BigNumber(0), count: 0};
-      if (volumeStats.tokens[takerToken] == undefined)
-        volumeStats.tokens[takerToken] = {volume: new web3.BigNumber(0), volumeFiat: new web3.BigNumber(0), count: 0};
+      if (statistics['volume'].tokens[makerToken] == undefined)
+        statistics['volume'].tokens[makerToken] = {volume: new web3.BigNumber(0), volumeFiat: new web3.BigNumber(0), count: 0};
+      if (statistics['volume'].tokens[takerToken] == undefined)
+        statistics['volume'].tokens[takerToken] = {volume: new web3.BigNumber(0), volumeFiat: new web3.BigNumber(0), count: 0};
 
       /* Volume per token */
-      volumeStats.tokens[makerToken].volume = volumeStats.tokens[makerToken].volume.add(makerVolume);
-      volumeStats.tokens[takerToken].volume = volumeStats.tokens[takerToken].volume.add(takerVolume);
+      statistics['volume'].tokens[makerToken].volume = statistics['volume'].tokens[makerToken].volume.add(makerVolume);
+      statistics['volume'].tokens[takerToken].volume = statistics['volume'].tokens[takerToken].volume.add(takerVolume);
 
       /* Fiat volume per token */
       if (this._tokenPrices[makerTokenSymbol]) {
         var fiatMakerVolume = makerVolume.mul(this._tokenPrices[makerTokenSymbol]);
-        volumeStats.tokens[makerToken].volumeFiat = volumeStats.tokens[makerToken].volumeFiat.add(fiatMakerVolume);
-        volumeStats.totalVolumeFiat = volumeStats.totalVolumeFiat.add(fiatMakerVolume);
+        statistics['volume'].tokens[makerToken].volumeFiat = statistics['volume'].tokens[makerToken].volumeFiat.add(fiatMakerVolume);
+        statistics['volume'].totalVolumeFiat = statistics['volume'].totalVolumeFiat.add(fiatMakerVolume);
       }
       if (this._tokenPrices[takerTokenSymbol]) {
         var fiatTakerVolume = takerVolume.mul(this._tokenPrices[takerTokenSymbol]);
-        volumeStats.tokens[takerToken].volumeFiat = volumeStats.tokens[takerToken].volumeFiat.add(fiatTakerVolume);
-        volumeStats.totalVolumeFiat = volumeStats.totalVolumeFiat.add(fiatTakerVolume);
+        statistics['volume'].tokens[takerToken].volumeFiat = statistics['volume'].tokens[takerToken].volumeFiat.add(fiatTakerVolume);
+        statistics['volume'].totalVolumeFiat = statistics['volume'].totalVolumeFiat.add(fiatTakerVolume);
       }
 
       /* Trade count per token and total trades */
-      volumeStats.tokens[makerToken].count += 1;
-      volumeStats.tokens[takerToken].count += 1;
-      volumeStats.totalTrades += 1;
+      statistics['volume'].tokens[makerToken].count += 1;
+      statistics['volume'].tokens[takerToken].count += 1;
+      statistics['volume'].totalTrades += 1;
     }
 
     /* Compute relay fees in fiat currency, if available */
     var zrxPrice = this._tokenPrices['ZRX'];
-    feeStats.totalFeesFiat = zrxPrice ? feeStats.totalFees.mul(zrxPrice) : null;
-    feeStats.fiatCurrency = this._fiatCurrency;
+    statistics['fees'].totalFeesFiat = zrxPrice ? statistics['fees'].totalFees.mul(zrxPrice) : null;
+    statistics['fees'].fiatCurrency = this._fiatCurrency;
 
     /* Prune price/volume history */
     this._priceVolumeHistory.prune();
 
     /* Call view callback */
-    this.statisticsUpdatedCallback(feeStats, volumeStats, this._priceVolumeHistory);
+    this.statisticsUpdatedCallback(statistics, this._priceVolumeHistory);
   },
 
   /* Update fiat token prices */

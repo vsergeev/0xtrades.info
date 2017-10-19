@@ -80,7 +80,7 @@ Panel.prototype = {
 
   /* Event handlers */
 
-  handleStatisticsUpdatedEvent: function (feeStats, volumeStats, priceVolumeHistory) {
+  handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
     /* Implemented in derived classes */
   },
 
@@ -171,27 +171,27 @@ VolumeStatisticsPanel.prototype = derive(Panel, {
     this._root.find('.panel-content').append(elem);
   },
 
-  handleStatisticsUpdatedEvent: function (feeStats, volumeStats, priceVolumeHistory) {
+  handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
     /* Clear current volumes */
     this._root.find("tr").remove();
 
     /* Look up currency information */
-    var currencyInfo = FIAT_CURRENCY_MAP[feeStats.fiatCurrency];
+    var currencyInfo = FIAT_CURRENCY_MAP[statistics['fees'].fiatCurrency];
 
     /* Aggregate fiat volume */
-    if (volumeStats.totalVolumeFiat.gt(0)) {
+    if (statistics['volume'].totalVolumeFiat.gt(0)) {
       var elem = $('<tr></tr>')
                    .append($('<th></th>')
                               .text("Aggregate Volume"))
                    .append($('<td></td>')
-                              .text(this._view.formatPrice(volumeStats.totalVolumeFiat, currencyInfo)));
+                              .text(this._view.formatPrice(statistics['volume'].totalVolumeFiat, currencyInfo)));
       this._root.find("tbody").first().append(elem);
     }
 
     /* ZRX Fees */
-    var totalRelayFees = feeStats.totalFees.toFixed(6);
-    if (feeStats.totalFeesFiat)
-      totalRelayFees += " (" + this._view.formatPrice(feeStats.totalFeesFiat, currencyInfo) + ")";
+    var totalRelayFees = statistics['fees'].totalFees.toFixed(6);
+    if (statistics['fees'].totalFeesFiat)
+      totalRelayFees += " (" + this._view.formatPrice(statistics['fees'].totalFeesFiat, currencyInfo) + ")";
 
     var elem = $('<tr></tr>')
                  .append($('<th></th>')
@@ -203,12 +203,12 @@ VolumeStatisticsPanel.prototype = derive(Panel, {
     this._root.find("tbody").first().append(elem);
 
     /* Token Volumes */
-    var tokens = Object.keys(volumeStats.tokens);
+    var tokens = Object.keys(statistics['volume'].tokens);
     for (var i = 0; i < tokens.length; i++) {
       if (ZEROEX_TOKEN_INFOS[tokens[i]]) {
-        var volume = volumeStats.tokens[tokens[i]].volume.toFixed(6);
-        if (volumeStats.tokens[tokens[i]].volumeFiat.gt(0))
-          volume += " (" + this._view.formatPrice(volumeStats.tokens[tokens[i]].volumeFiat, currencyInfo) + ")";
+        var volume = statistics['volume'].tokens[tokens[i]].volume.toFixed(6);
+        if (statistics['volume'].tokens[tokens[i]].volumeFiat.gt(0))
+          volume += " (" + this._view.formatPrice(statistics['volume'].tokens[tokens[i]].volumeFiat, currencyInfo) + ")";
 
         var elem = $('<tr></tr>')
                      .append($('<th></th>')
@@ -375,20 +375,20 @@ TokenVolumeChartPanel.prototype = derive(Panel, {
     this._chart = new Chart(elem.find('canvas')[0].getContext('2d'), chartConfig);
   },
 
-  handleStatisticsUpdatedEvent: function (feeStats, volumeStats, priceVolumeHistory) {
+  handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
     /* Look up currency information */
-    var currencyInfo = FIAT_CURRENCY_MAP[feeStats.fiatCurrency];
+    var currencyInfo = FIAT_CURRENCY_MAP[statistics['fees'].fiatCurrency];
 
-    var tokens = Object.keys(volumeStats.tokens);
+    var tokens = Object.keys(statistics['volume'].tokens);
     var tokenNames = [];
     var tokenVolumes = []
     var tokenVolumesFormatted = [];
 
     for (var i = 0; i < tokens.length; i++) {
-      if (ZEROEX_TOKEN_INFOS[tokens[i]] && volumeStats.tokens[tokens[i]].volumeFiat.gt(0)) {
+      if (ZEROEX_TOKEN_INFOS[tokens[i]] && statistics['volume'].tokens[tokens[i]].volumeFiat.gt(0)) {
         tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
-        tokenVolumes.push(volumeStats.tokens[tokens[i]].volumeFiat.toNumber());
-        tokenVolumesFormatted.push(this._view.formatPrice(volumeStats.tokens[tokens[i]].volumeFiat, currencyInfo));
+        tokenVolumes.push(statistics['volume'].tokens[tokens[i]].volumeFiat.toNumber());
+        tokenVolumesFormatted.push(this._view.formatPrice(statistics['volume'].tokens[tokens[i]].volumeFiat, currencyInfo));
       }
     }
 
@@ -430,15 +430,15 @@ TokenOccurrenceChartPanel.prototype = derive(Panel, {
     this._chart = new Chart(elem.find('canvas')[0].getContext('2d'), chartConfig);
   },
 
-  handleStatisticsUpdatedEvent: function (feeStats, volumeStats, priceVolumeHistory) {
-    var tokens = Object.keys(volumeStats.tokens);
+  handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
+    var tokens = Object.keys(statistics['volume'].tokens);
     var tokenNames = [];
     var tokenCounts = [];
 
     for (var i = 0; i < tokens.length; i++) {
       if (ZEROEX_TOKEN_INFOS[tokens[i]]) {
         tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
-        tokenCounts.push(volumeStats.tokens[tokens[i]].count);
+        tokenCounts.push(statistics['volume'].tokens[tokens[i]].count);
       }
     }
 
@@ -479,9 +479,9 @@ FeeFeelessChartPanel.prototype = derive(Panel, {
     this._chart = new Chart(elem.find('canvas')[0].getContext('2d'), chartConfig);
   },
 
-  handleStatisticsUpdatedEvent: function (feeStats, volumeStats, priceVolumeHistory) {
+  handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
     this._chart.data.labels = ["Fee", "Fee-less"];
-    this._chart.data.datasets[0].data = [feeStats.feeCount, feeStats.feelessCount];
+    this._chart.data.datasets[0].data = [statistics['fees'].feeCount, statistics['fees'].feelessCount];
     this._chart.update();
   },
 });
@@ -517,8 +517,8 @@ RelayFeeChartPanel.prototype = derive(Panel, {
     this._chart = new Chart(elem.find('canvas')[0].getContext('2d'), chartConfig);
   },
 
-  handleStatisticsUpdatedEvent: function (feeStats, volumeStats, priceVolumeHistory) {
-    var relayAddresses = Object.keys(feeStats.relays);
+  handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
+    var relayAddresses = Object.keys(statistics['fees'].relays);
     var relayNames = [];
     var relayFees = [];
     var relayFeesFormatted = [];
@@ -528,8 +528,8 @@ RelayFeeChartPanel.prototype = derive(Panel, {
         continue;
 
       relayNames.push(this._view.formatRelay(relayAddresses[i]));
-      relayFees.push(feeStats.relays[relayAddresses[i]].toNumber());
-      relayFeesFormatted.push(feeStats.relays[relayAddresses[i]].toDigits(6) + " ZRX");
+      relayFees.push(statistics['fees'].relays[relayAddresses[i]].toNumber());
+      relayFeesFormatted.push(statistics['fees'].relays[relayAddresses[i]].toDigits(6) + " ZRX");
     }
 
     this._chart.data.labels = relayNames;
@@ -593,7 +593,7 @@ PriceChartPanel.prototype = derive(Panel, {
     this.handleSelectTokenPair(PRICE_CHART_DEFAULT_PAIR);
   },
 
-  handleStatisticsUpdatedEvent: function (feeStats, volumeStats, priceVolumeHistory) {
+  handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
     /* Update token pair list */
     var self = this;
     this._root.find('li').remove();
@@ -607,7 +607,7 @@ PriceChartPanel.prototype = derive(Panel, {
                       e.preventDefault();
                       self.handleSelectTokenPair(e.data.pair);
                       /* FIXME refresh hack */
-                      self.handleStatisticsUpdatedEvent(null, null, self._view.getPriceVolumeHistoryCallback());
+                      self.handleStatisticsUpdatedEvent(null, self._view.getPriceVolumeHistoryCallback());
                     }))
       );
     }
