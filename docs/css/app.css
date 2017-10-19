@@ -108,6 +108,19 @@ div.panel-header:hover .panel-close {
 
 /******************************************************************************/
 
+/* EmptyPanel */
+
+.empty-panel-select {
+  height: 10vh;
+}
+
+.empty-panel-select div {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+/******************************************************************************/
+
 /* VolumeStatisticsPanel */
 
 .volume-statistics th {

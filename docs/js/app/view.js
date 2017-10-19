@@ -33,6 +33,8 @@ var View = function () {
 
   /* State */
   this._panels = [];
+  this._lastNewTradeEvent = [null, null, null];
+  this._lastStatisticsUpdatedEvent = [null, null];
 
   /* Callbacks to model */
   this.fetchMoreCallback = null;
@@ -100,6 +102,8 @@ View.prototype = {
 
     for (var i = 0; i < this._panels.length; i++)
       this._panels[i].handleNewTradeEvent(index, trade, tradeHistory);
+
+    this._lastNewTradeEvent = arguments;
   },
 
   handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
@@ -109,6 +113,8 @@ View.prototype = {
 
     for (var i = 0; i < this._panels.length; i++)
       this._panels[i].handleStatisticsUpdatedEvent(statistics, priceVolumeHistory);
+
+    this._lastStatisticsUpdatedEvent = arguments;
   },
 
   /* Button handlers */
@@ -146,6 +152,8 @@ View.prototype = {
 
     panel.create(dom);
     this._panels.push(panel);
+
+    return panel;
   },
 
   panelRemove: function (panel, prune) {
@@ -165,6 +173,11 @@ View.prototype = {
           root.remove();
       }
     }
+  },
+
+  panelRefresh: function (panel) {
+    panel.handleNewTradeEvent.apply(panel, this._lastNewTradeEvent);
+    panel.handleStatisticsUpdatedEvent.apply(panel, this._lastStatisticsUpdatedEvent);
   },
 
   /* Formatting Helpers */

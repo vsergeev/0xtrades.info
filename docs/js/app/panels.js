@@ -110,23 +110,40 @@ EmptyPanel.prototype = derive(Panel, {
     Panel.prototype.create.call(this, root);
 
     var elem = $(`
-        <div class="row">
-          <div class="text-center">
-          </div>
+      <div class="row empty-panel-select">
+        <div class="dropdown-center">
+          <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true">
+            Select...<span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu"></ul>
         </div>
+      </div>
     `);
 
-    /* FIXME add drop down panel select */
+    var self = this;
+    for (var i = 0; i < PanelList.length; i++) {
+      elem.find('ul').append(
+        $("<li></li>")
+          .append($("<a></a>")
+                    .text(PanelList[i][0])
+                    .attr('href', '#')
+                    .on('click', {cls: PanelList[i][1]}, function (e) {
+                      e.preventDefault();
+                      self.handleSelect(e.data.cls);
+                    }))
+      );
+    }
 
     this._root.find('.panel-content').append(elem);
   },
 
-  handeSelect: function (choice) {
+  handleSelect: function (cls) {
     var root = this._root;
+    var view = this._view;
 
     this._view.panelRemove(this);
 
-    this._view.panelCreate(root, EmptyPanel /* FIXME */);
+    view.panelRefresh(view.panelCreate(root, cls));
   },
 });
 
@@ -592,8 +609,7 @@ PriceChartPanel.prototype = derive(Panel, {
                     .on('click', {pair: priceVolumeHistory.tokens[j]}, function (e) {
                       e.preventDefault();
                       self.handleSelectTokenPair(e.data.pair);
-                      /* FIXME refresh hack */
-                      self.handleStatisticsUpdatedEvent(null, self._view.getPriceVolumeHistoryCallback());
+                      self._view.panelRefresh(self);
                     }))
       );
     }
@@ -613,3 +629,17 @@ PriceChartPanel.prototype = derive(Panel, {
     this._root.find("span.price-chart-pair-text").text(this._tokenPair);
   },
 });
+
+/******************************************************************************/
+/* List of all available panels */
+/******************************************************************************/
+
+PanelList = [
+  ["Volume", VolumeStatisticsPanel],
+  ["Recent Trades", RecentTradesPanel],
+  ["Token Volume Chart", TokenVolumeChartPanel],
+  ["Token Occurrence Chart", TokenOccurrenceChartPanel],
+  ["Fee vs. Feeless Chart", FeeFeelessChartPanel],
+  ["Relay Fee Chart", RelayFeeChartPanel],
+  ["Price Chart", PriceChartPanel],
+];
