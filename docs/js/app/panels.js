@@ -84,7 +84,7 @@ Panel.prototype = {
     /* Implemented in derived classes */
   },
 
-  handleNewTradeEvent: function (trades, newTrade) {
+  handleNewTradeEvent: function (index, trade, tradeHistory) {
     /* Implemented in derived classes */
   },
 
@@ -270,16 +270,16 @@ RecentTradesPanel.prototype = derive(Panel, {
     this._initialized = false;
   },
 
-  handleNewTradeEvent: function (trades, index, newTrade) {
+  handleNewTradeEvent: function (index, trade, tradeHistory) {
     if (!this._initialized) {
-      for (var i = 0; i < trades.length; i++)
-        this.addNewTrade(i, trades[i]);
+      for (var i = 0; i < tradeHistory.length; i++)
+        this.addNewTrade(i, tradeHistory[i]);
 
       this._root.find("button.recent-trades-fetch-more").prop('disabled', false);
 
       this._initialized = true;
     } else {
-      this.addNewTrade(index, newTrade);
+      this.addNewTrade(index, trade);
     }
   },
 

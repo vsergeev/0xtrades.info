@@ -32,7 +32,6 @@ var View = function () {
   this._networkId = null;
 
   /* State */
-  this._trades = [];
   this._panels = [];
 
   /* Callbacks to model */
@@ -91,20 +90,13 @@ View.prototype = {
     $('#currency-dropdown-text').text(FIAT_CURRENCY_MAP[fiatCurrency].symbol + " " + fiatCurrency);
   },
 
-  handleNewTradeEvent: function (trade) {
-    Logger.log('[View] Got New Trade Event');
+  handleNewTradeEvent: function (index, trade, tradeHistory) {
+    Logger.log('[View] Got New Trade Event at index ' + index);
     Logger.log(trade);
-
-    /* Insert it in the right position in our trades */
-    var index = 0;
-    for (index = 0; index < this._trades.length; index++) {
-      if (this._trades[index].timestamp < trade.timestamp)
-        break;
-    }
-    this._trades.splice(index, 0, trade);
+    Logger.log(tradeHistory);
 
     for (var i = 0; i < this._panels.length; i++)
-      this._panels[i].handleNewTradeEvent(this._trades, index, trade);
+      this._panels[i].handleNewTradeEvent(index, trade, tradeHistory);
   },
 
   handleStatisticsUpdatedEvent: function (feeStats, volumeStats, priceVolumeHistory) {

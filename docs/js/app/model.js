@@ -220,7 +220,7 @@ Model.prototype = {
           }
 
           /* Call view callback */
-          self.newTradeCallback(trade);
+          self.newTradeCallback(index, trade, self._trades);
 
           /* Update statistics */
           self.updateStatistics();
