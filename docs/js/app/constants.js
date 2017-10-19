@@ -40,10 +40,13 @@ var ZEROEX_RELAY_ADDRESSES = {
   42: {},
 };
 
+/* Populated by model */
 var ZEROEX_TOKEN_INFOS = {};
 
+/* Populated by model */
 var ZEROEX_EXCHANGE_ADDRESS = null;
 
+/* Populated by model */
 var ZEROEX_TOKEN_ADDRESS = null;
 
 var NETWORK_NAME = {
