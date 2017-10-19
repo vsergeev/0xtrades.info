@@ -164,6 +164,15 @@ div.panel-header:hover .panel-close {
 
 /******************************************************************************/
 
+/* Add Panel Row Buttons */
+
+.add-panel-row-buttons {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/******************************************************************************/
+
 /* Footer */
 
 .footer {

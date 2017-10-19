@@ -48,6 +48,9 @@ View.prototype = {
       $('#currency-dropdown-list').append($("<li></li>").append($("<a></a>").attr("href", "?" + searchParams.toString()).text(text)));
     }
 
+    $('#add-panel-row-button').click(this.handleAddPanelRow.bind(this));
+    $('#add-split-panel-row-button').click(this.handleAddSplitPanelRow.bind(this));
+
     var root1, root2;
 
     this.panelCreate(this.domAddPanelRow(), VolumeStatisticsPanel);
