@@ -39,7 +39,7 @@ var Panel = function (view) {
 
 Panel.prototype = {
   create: function (root) {
-    /* Create skeleton DOM with header, header link, and close button */
+    /* Create skeleton DOM with panel header, controls, and content div */
     var dom = $(`
       <div class="row panel-header">
         <span class="anchor" id="panel-${this._id}"></span>
@@ -82,10 +82,6 @@ Panel.prototype = {
   },
 
   handleNewTradeEvent: function (index, trade, tradeHistory) {
-    /* Implemented in derived classes */
-  },
-
-  handleRefreshEvent: function () {
     /* Implemented in derived classes */
   },
 };
