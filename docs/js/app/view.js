@@ -116,6 +116,13 @@ View.prototype = {
     for (var i = 0; i < this._panels.length; i++)
       this._panels[i].handleStatisticsUpdatedEvent(statistics, priceVolumeHistory);
 
+    /* Update ZRX price in status bar */
+    var currencyInfo = FIAT_CURRENCY_MAP[statistics['fees'].fiatCurrency];
+    if (statistics['fees'].zrxPrice)
+      $('#status-bar-zrx-price-text').text(this.formatPrice(statistics['fees'].zrxPrice, currencyInfo));
+    else
+      $('#status-bar-zrx-price-text').text("N/A");
+
     this._lastStatisticsUpdatedEvent = arguments;
   },
 

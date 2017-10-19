@@ -308,6 +308,7 @@ Model.prototype = {
     var zrxPrice = this._tokenPrices['ZRX'];
     statistics['fees'].totalFeesFiat = zrxPrice ? statistics['fees'].totalFees.mul(zrxPrice) : null;
     statistics['fees'].fiatCurrency = this._fiatCurrency;
+    statistics['fees'].zrxPrice = zrxPrice;
 
     /* Prune price/volume history */
     this._priceVolumeHistory.prune();

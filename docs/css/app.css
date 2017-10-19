@@ -219,13 +219,13 @@ div.panel-header:hover .panel-close {
 }
 
 #status-bar table td {
-  width: 50%;
+  width: 33.3%;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-#status-bar a {
+#status-bar a, #status-bar b {
   color: #62AEFC;
 }
