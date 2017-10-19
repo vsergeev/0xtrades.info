@@ -55,7 +55,9 @@ View.prototype = {
 
     var root1, root2;
 
-    this.panelCreate(this.domAddPanelRow(), VolumeStatisticsPanel);
+    [root1, root2] = this.domAddSplitPanelRow();
+    this.panelCreate(root1, VolumeStatisticsPanel);
+    this.panelCreate(root2, TokenVolumeChartPanel);
     this.panelCreate(this.domAddPanelRow(), RecentTradesPanel);
     [root1, root2] = this.domAddSplitPanelRow();
     this.panelCreate(root1, TokenVolumeChartPanel);
