@@ -59,7 +59,7 @@ Panel.prototype = {
     dom.find(".panel-close")
       .on('click', {panel: this, view: this._view}, function (e) {
         e.preventDefault();
-        e.data.view.panelRemove(e.data.panel);
+        e.data.view.panelRemove(e.data.panel, true);
       });
 
     root.append(dom);
@@ -69,11 +69,8 @@ Panel.prototype = {
   },
 
   destroy: function () {
-    if (this._dom) {
-      this._dom.remove();
-      this._dom = null;
-    }
-
+    this._dom.remove();
+    this._dom = null;
     this._root = null;
     this._view = null;
   },
@@ -113,26 +110,15 @@ EmptyPanel.prototype = derive(Panel, {
     Panel.prototype.create.call(this, root);
 
     var elem = $(`
-      <div class="row text-center">
-        <button type="button" class="btn btn-sm btn-info">Split</button>
-      </div>
+        <div class="row">
+          <div class="text-center">
+          </div>
+        </div>
     `);
-
-    elem.find('button').click(this.handleSplit.bind(this));
 
     /* FIXME add drop down panel select */
 
     this._root.find('.panel-content').append(elem);
-  },
-
-  handleSplit: function () {
-    var root = this._root;
-
-    this._view.panelRemove(this);
-
-    [panel1, panel2] = this._view.domSplitPanelRow(root);
-    this._view.panelCreate(panel1, EmptyPanel);
-    this._view.panelCreate(panel2, EmptyPanel);
   },
 
   handeSelect: function (choice) {

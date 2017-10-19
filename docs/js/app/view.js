@@ -52,10 +52,10 @@ View.prototype = {
 
     this.panelCreate(this.domAddPanelRow(), VolumeStatisticsPanel);
     this.panelCreate(this.domAddPanelRow(), RecentTradesPanel);
-    [root1, root2] = this.domSplitPanelRow(this.domAddPanelRow());
+    [root1, root2] = this.domAddSplitPanelRow();
     this.panelCreate(root1, TokenVolumeChartPanel);
     this.panelCreate(root2, TokenOccurrenceChartPanel);
-    [root1, root2] = this.domSplitPanelRow(this.domAddPanelRow());
+    [root1, root2] = this.domAddSplitPanelRow();
     this.panelCreate(root1, FeeFeelessChartPanel);
     this.panelCreate(root2, RelayFeeChartPanel);
     this.panelCreate(this.domAddPanelRow(), PriceChartPanel);
@@ -114,38 +114,54 @@ View.prototype = {
     this.panelCreate(this.domAddPanelRow(), EmptyPanel);
   },
 
+  handleAddSplitPanelRow: function () {
+    [root1, root2] = this.domAddSplitPanelRow();
+    this.panelCreate(root1, EmptyPanel);
+    this.panelCreate(root2, EmptyPanel);
+  },
+
   /* Panel management */
 
   domAddPanelRow: function () {
-    var root = $('<div></div>').addClass('panel');
-    $('.container').first().append(root);
+    var root = $('<div></div>').addClass('panel-row');
+    $('#end-of-container').before(root);
     return root;
   },
 
-  domSplitPanelRow: function (root) {
-    var root1 = $('<div></div>').addClass('panel');
-    var root2 = $('<div></div>').addClass('panel');
-    var row = $('<div></div>')
-                .addClass('row')
-                .append($('<div></div>')
-                          .addClass('col-sm-6')
-                          .append(root1))
-                .append($('<div></div>')
-                          .addClass('col-sm-6')
-                          .append(root2));
-    root.append(row);
+  domAddSplitPanelRow: function () {
+    var root1 = $('<div></div>').addClass('col-sm-6 panel-col');
+    var root2 = $('<div></div>').addClass('col-sm-6 panel-col');
+    var row = $('<div></div>').addClass('row')
+                .append(root1)
+                .append(root2);
+    $('#end-of-container').before(row);
     return [root1, root2];
   },
 
-  panelCreate: function (dom, cls) {
-    var panel = new cls(this);
+  panelCreate: function (dom, cls, args) {
+    var panel = new cls(this, args);
+
     panel.create(dom);
     this._panels.push(panel);
   },
 
-  panelRemove: function (panel) {
+  panelRemove: function (panel, prune) {
+    var root = panel._root;
+
     panel.destroy();
     this._panels.splice(this._panels.indexOf(panel), 1);
+
+    /* Prune empty rows */
+    if (prune) {
+      if (root.hasClass('panel-row')) {
+        root.remove();
+      } else if (root.hasClass('panel-col')) {
+        root = root.parent();
+
+        if (root.find('.panel-header').length == 0)
+          root.remove();
+      }
+    }
   },
 
   /* Formatting Helpers */
