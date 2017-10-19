@@ -33,11 +33,9 @@ var View = function () {
 
   /* State */
   this._trades = [];
-  this._priceInverted = false;
-  this._priceCharts = [];
   this._panels = [];
 
-  /* Callbacks */
+  /* Callbacks to model */
   this.fetchMoreCallback = null;
   this.getPriceVolumeHistoryCallback = null;
 };
@@ -123,7 +121,6 @@ View.prototype = {
 
   handleAddPanelRow: function () {
     this.panelCreate(this.domAddPanelRow(), EmptyPanel);
-    App.model.updateStatistics();
   },
 
   /* Panel management */
