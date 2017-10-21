@@ -231,11 +231,11 @@ View.prototype = {
 
   formatRelayLink: function (address) {
     if (ZEROEX_RELAY_ADDRESSES[this._networkId][address]) {
-      return this.formatAddressLink(address, ZEROEX_RELAY_ADDRESSES[this._networkId][address]);
+      return this.formatTokenAddressLink(ZEROEX_TOKEN_ADDRESS, address, ZEROEX_RELAY_ADDRESSES[this._networkId][address]);
     } else if (web3.toDecimal(address) == 0) {
       return $("<span></span>").text("None");
     } else {
-      return this.formatAddressLink(address, this.formatHex(address));
+      return this.formatTokenAddressLink(ZEROEX_TOKEN_ADDRESS, address, this.formatHex(address));
     }
   },
 
@@ -245,6 +245,24 @@ View.prototype = {
     if (baseUrl) {
       var elem = $('<a></a>')
                  .attr('href', baseUrl + "/tx/" + txid)
+                 .attr('target', '_blank')
+                 .text(text);
+
+      if (showLinkIcon)
+        elem = elem.append($('<i></i>').addClass('icon-link-ext'));
+
+      return elem;
+    } else {
+      return text;
+    }
+  },
+
+  formatTokenAddressLink: function (token, address, text, showLinkIcon) {
+    var baseUrl = NETWORK_BLOCK_EXPLORER[this._networkId];
+
+    if (baseUrl) {
+      var elem = $('<a></a>')
+                 .attr('href', baseUrl + "/token/" + token + "/?a=" + address)
                  .attr('target', '_blank')
                  .text(text);
 
