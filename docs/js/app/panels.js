@@ -435,6 +435,10 @@ TokenOccurrenceChartPanel.prototype = derive(Panel, {
 
   handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
     var tokens = Object.keys(statistics['volume'].tokens);
+
+    /* Sort tokens by address */
+    tokens.sort();
+
     var tokenNames = [];
     var tokenCounts = [];
     var unknownCount = 0;
