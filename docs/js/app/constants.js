@@ -83,7 +83,7 @@ var BLOCK_FETCH_COUNT = Math.ceil(STATISTICS_TIME_WINDOW/17);
 
 var PRICE_UPDATE_TIMEOUT = 5*60*1000;
 
-var PRICE_CHART_DEFAULT_PAIR = "ZRX:WETH";
+var PRICE_CHART_DEFAULT_PAIR = "ZRX/WETH";
 
 var CHART_DEFAULT_COLORS = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a',
                             '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94',

@@ -515,7 +515,7 @@ PriceVolumeHistory.prototype = {
       this._priceData[a][b] = [];
       this._volumeData[a][b] = [];
       this._timestamps[a][b] = [];
-      this.tokens.push(a + ":" + b);
+      this.tokens.push(a + "/" + b);
       this.tokens.sort();
     }
   },
