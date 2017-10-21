@@ -496,6 +496,12 @@ PriceVolumeHistory.prototype = {
           this._priceData[taker][maker].shift();
           this._volumeData[maker][taker].shift();
           this._volumeData[taker][maker].shift();
+
+          if (this._timestamps[maker][taker].length == 0) {
+            this.tokens.splice(this.tokens.indexOf(maker + "/" + taker), 1);
+            this.tokens.splice(this.tokens.indexOf(taker + "/" + maker), 1);
+          }
+
           pruned = true;
         }
       }
