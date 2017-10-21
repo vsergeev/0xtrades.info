@@ -182,7 +182,7 @@ Model.prototype = {
         Logger.log('[Model] Got Log Fill event');
 
         /* If we've already processed this trade, skip it */
-        if (this._tradesSeen[result.transactionHash + result.logIndex])
+        if (this._tradesSeen[result.transactionHash + result.args.orderHash])
           return;
 
         var trade = {
@@ -222,7 +222,7 @@ Model.prototype = {
         }
 
         /* Mark this trade as seen */
-        this._tradesSeen[result.transactionHash + result.logIndex] = true;
+        this._tradesSeen[result.transactionHash + result.args.orderHash] = true;
 
         /* Fetch timestamp associated with this block */
         var self = this;
