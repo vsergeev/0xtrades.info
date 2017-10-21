@@ -200,6 +200,12 @@ VolumeStatisticsPanel.prototype = derive(Panel, {
 
     /* Token Volumes */
     var tokens = Object.keys(statistics['volume'].tokens);
+
+    /* Sort tokens by fiat volume */
+    tokens.sort(function (a, b) {
+        return statistics['volume'].tokens[a].volumeFiat.lt(statistics['volume'].tokens[b].volumeFiat);
+    });
+
     for (var i = 0; i < tokens.length; i++) {
       if (ZEROEX_TOKEN_INFOS[tokens[i]]) {
         var volume = statistics['volume'].tokens[tokens[i]].volume.toFixed(6);
