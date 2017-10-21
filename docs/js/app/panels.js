@@ -532,6 +532,10 @@ RelayFeeChartPanel.prototype = derive(Panel, {
 
   handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
     var relayAddresses = Object.keys(statistics['fees'].relays);
+
+    /* Sort relays by address */
+    relayAddresses.sort();
+
     var relayNames = [];
     var relayFees = [];
     var relayFeesFormatted = [];
