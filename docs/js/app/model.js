@@ -489,7 +489,7 @@ PriceVolumeHistory.prototype = {
 
   /* Get price data for a token pair */
   getPriceData: function (tokenPair) {
-    var [quote, base] = tokenPair.split(":");
+    var [quote, base] = tokenPair.split("/");
 
     if (this._priceData[base] && this._priceData[base][quote])
       return this._priceData[base][quote];
@@ -499,7 +499,7 @@ PriceVolumeHistory.prototype = {
 
   /* Get volume data for a token pair */
   getVolumeData: function (tokenPair) {
-    var [quote, base] = tokenPair.split(":");
+    var [quote, base] = tokenPair.split("/");
 
     if (this._volumeData[base] && this._volumeData[base][quote])
       return this._volumeData[base][quote];
