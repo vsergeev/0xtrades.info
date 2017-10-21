@@ -42,7 +42,14 @@ var ZEROEX_RELAY_ADDRESSES = {
 };
 
 /* Populated by model */
-var ZEROEX_TOKEN_INFOS = {};
+var ZEROEX_TOKEN_INFOS = {
+    /* Pre-load some newer token infos */
+    "0x8f8221afbb33998d8584a2b05749ba73c37a938a": {
+      name: "Request",
+      symbol: "REQ",
+      decimals: 18,
+    },
+};
 
 /* Populated by model */
 var ZEROEX_EXCHANGE_ADDRESS = null;
