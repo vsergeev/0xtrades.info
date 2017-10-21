@@ -427,13 +427,19 @@ TokenOccurrenceChartPanel.prototype = derive(Panel, {
     var tokens = Object.keys(statistics['volume'].tokens);
     var tokenNames = [];
     var tokenCounts = [];
+    var unknownCount = 0;
 
     for (var i = 0; i < tokens.length; i++) {
       if (ZEROEX_TOKEN_INFOS[tokens[i]]) {
         tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
         tokenCounts.push(statistics['volume'].tokens[tokens[i]].count);
+      } else {
+        unknownCount += 1;
       }
     }
+
+    tokenNames.push('Unknown');
+    tokenCounts.push(unknownCount);
 
     this._chart.data.labels = tokenNames;
     this._chart.data.datasets[0].data = tokenCounts;
