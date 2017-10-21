@@ -127,7 +127,7 @@ Model.prototype = {
 
   /* Blockchain helper functions */
 
-  getBlockTimestamp: function (blockNumber) {
+  _getBlockTimestamp: function (blockNumber) {
     var self = this;
 
     return new Promise(function (resolve, reject) {
@@ -138,12 +138,39 @@ Model.prototype = {
           if (error) {
             reject(error);
           } else {
-            self._blockTimestamps[blockNumber] = result.timestamp;
-            resolve(result.timestamp);
+            if (result) {
+              self._blockTimestamps[blockNumber] = result.timestamp;
+              resolve(result.timestamp);
+            } else {
+              /* Block information not available yet */
+              resolve(null);
+            }
           }
         });
       }
     });
+  },
+
+  getBlockTimestamp: function (blockNumber) {
+    var self = this;
+
+    return this._getBlockTimestamp(blockNumber).then(function (result) {
+      if (result) {
+        Logger.log("[Model] Got block info for " + blockNumber);
+        return result;
+      } else {
+        Logger.log("[Model] Block info unavailable for " + blockNumber);
+        Logger.log("[Model] Retrying in " + BLOCK_INFO_RETRY_TIMEOUT/1000 + " seconds");
+
+        /* Retry after duration */
+        return (new Promise(function (resolve) {
+          setTimeout(resolve, BLOCK_INFO_RETRY_TIMEOUT);
+        })).then(function () {
+          return self.getBlockTimestamp(blockNumber);
+        });
+      }
+    })
+
   },
 
   /* Blockchain event handlers */
