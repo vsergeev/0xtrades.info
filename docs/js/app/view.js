@@ -33,6 +33,7 @@ var View = function () {
 
   /* State */
   this._panels = [];
+  this._currencyInfo = null;
   this._lastNewTradeEvent = [null, null, null];
   this._lastStatisticsUpdatedEvent = [null, null];
 
@@ -93,8 +94,10 @@ View.prototype = {
       this.showResultModal(false, "Unsupported network", "This network is unsupported.<br><br>Please switch to Mainnet or Kovan.");
     }
 
+    this._currencyInfo = FIAT_CURRENCY_MAP[fiatCurrency];
+
     /* Update selected currency text */
-    $('#currency-dropdown-text').text(FIAT_CURRENCY_MAP[fiatCurrency].symbol + " " + fiatCurrency);
+    $('#currency-dropdown-text').text(this._currencyInfo.symbol + " " + fiatCurrency);
   },
 
   handleNewTradeEvent: function (index, trade, tradeHistory) {
@@ -117,9 +120,8 @@ View.prototype = {
       this._panels[i].handleStatisticsUpdatedEvent(statistics, priceVolumeHistory);
 
     /* Update ZRX price in status bar */
-    var currencyInfo = FIAT_CURRENCY_MAP[statistics['fees'].fiatCurrency];
     if (statistics['fees'].zrxPrice)
-      $('#status-bar-zrx-price-text').text(this.formatPrice(statistics['fees'].zrxPrice, currencyInfo));
+      $('#status-bar-zrx-price-text').text(this.formatPrice(statistics['fees'].zrxPrice));
     else
       $('#status-bar-zrx-price-text').text("N/A");
 
@@ -202,8 +204,8 @@ View.prototype = {
     return year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
   },
 
-  formatPrice: function (price, currencyInfo) {
-    return currencyInfo.symbol + price.toFixed(currencyInfo.decimal_digits) + " " + currencyInfo.code;
+  formatPrice: function (price) {
+    return this._currencyInfo.symbol + price.toFixed(this._currencyInfo.decimal_digits) + " " + this._currencyInfo.code;
   },
 
   formatHex: function (hex, digits) {

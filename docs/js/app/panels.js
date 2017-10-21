@@ -174,23 +174,20 @@ VolumeStatisticsPanel.prototype = derive(Panel, {
     /* Clear current volumes */
     this._root.find("tr").remove();
 
-    /* Look up currency information */
-    var currencyInfo = FIAT_CURRENCY_MAP[statistics['fees'].fiatCurrency];
-
     /* Aggregate fiat volume */
     if (statistics['volume'].totalVolumeFiat.gt(0)) {
       var elem = $('<tr></tr>')
                    .append($('<th></th>')
                               .text("Aggregate Volume"))
                    .append($('<td></td>')
-                              .text(this._view.formatPrice(statistics['volume'].totalVolumeFiat, currencyInfo)));
+                              .text(this._view.formatPrice(statistics['volume'].totalVolumeFiat)));
       this._root.find("tbody").first().append(elem);
     }
 
     /* ZRX Fees */
     var totalRelayFees = statistics['fees'].totalFees.toFixed(6);
     if (statistics['fees'].totalFeesFiat)
-      totalRelayFees += " (" + this._view.formatPrice(statistics['fees'].totalFeesFiat, currencyInfo) + ")";
+      totalRelayFees += " (" + this._view.formatPrice(statistics['fees'].totalFeesFiat) + ")";
 
     var elem = $('<tr></tr>')
                  .append($('<th></th>')
@@ -207,7 +204,7 @@ VolumeStatisticsPanel.prototype = derive(Panel, {
       if (ZEROEX_TOKEN_INFOS[tokens[i]]) {
         var volume = statistics['volume'].tokens[tokens[i]].volume.toFixed(6);
         if (statistics['volume'].tokens[tokens[i]].volumeFiat.gt(0))
-          volume += " (" + this._view.formatPrice(statistics['volume'].tokens[tokens[i]].volumeFiat, currencyInfo) + ")";
+          volume += " (" + this._view.formatPrice(statistics['volume'].tokens[tokens[i]].volumeFiat) + ")";
 
         var elem = $('<tr></tr>')
                      .append($('<th></th>')
@@ -375,9 +372,6 @@ TokenVolumeChartPanel.prototype = derive(Panel, {
   },
 
   handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
-    /* Look up currency information */
-    var currencyInfo = FIAT_CURRENCY_MAP[statistics['fees'].fiatCurrency];
-
     var tokens = Object.keys(statistics['volume'].tokens);
     var tokenNames = [];
     var tokenVolumes = []
@@ -387,7 +381,7 @@ TokenVolumeChartPanel.prototype = derive(Panel, {
       if (ZEROEX_TOKEN_INFOS[tokens[i]] && statistics['volume'].tokens[tokens[i]].volumeFiat.gt(0)) {
         tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
         tokenVolumes.push(statistics['volume'].tokens[tokens[i]].volumeFiat.toNumber());
-        tokenVolumesFormatted.push(this._view.formatPrice(statistics['volume'].tokens[tokens[i]].volumeFiat, currencyInfo));
+        tokenVolumesFormatted.push(this._view.formatPrice(statistics['volume'].tokens[tokens[i]].volumeFiat));
       }
     }
 
