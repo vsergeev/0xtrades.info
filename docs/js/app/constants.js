@@ -66,6 +66,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "POE",
       decimals: 8,
     },
+    "0x8ae4bf2c33a8e667de34b54938b0ccd03eb8cc06": {
+      name: "Patientory",
+      symbol: "PTOY",
+      decimals: 8,
+    },
 };
 
 /* Populated by model */
