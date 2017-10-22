@@ -62,7 +62,7 @@ View.prototype = {
     this.panelCreate(this.domAddPanelRow(), RecentTradesPanel);
     [root1, root2] = this.domAddSplitPanelRow();
     this.panelCreate(root1, TokenVolumeChartPanel);
-    this.panelCreate(root2, TokenOccurrenceChartPanel);
+    this.panelCreate(root2, TokenPairsChartPanel);
     [root1, root2] = this.domAddSplitPanelRow();
     this.panelCreate(root1, FeeFeelessChartPanel);
     this.panelCreate(root2, RelayFeeChartPanel);
