@@ -51,6 +51,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "REQ",
       decimals: 18,
     },
+    "0xd4fa1460f537bb9085d22c7bccb5dd450ef28e3a": {
+      name: "Populous Platform",
+      symbol: "PPT",
+      decimals: 8,
+    },
 };
 
 /* Populated by model */
