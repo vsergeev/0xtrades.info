@@ -657,6 +657,60 @@ RelayFeeChartPanel.prototype = derive(Panel, {
 });
 
 /******************************************************************************/
+/* RelayTradesChartPanel */
+/******************************************************************************/
+
+var RelayTradesChartPanel = function (view) {
+  Panel.call(this, view);
+  this._title = "Relay Trades (24 hr)";
+};
+
+RelayTradesChartPanel.prototype = derive(Panel, {
+  constructor: RelayTradesChartPanel,
+
+  create: function (root) {
+    Panel.prototype.create.call(this, root);
+
+    var elem = $(`
+      <div class="row canvas-wrapper text-center">
+        <canvas width="400" height="400"></canvas>
+      </div>
+    `);
+
+    this._root.find(".panel-content").append(elem);
+
+    var chartConfig = {
+      type: 'pie',
+      options: {responsive: true, tooltips: {callbacks: {label: CHART_DEFAULT_TOOLTIP_CALLBACK}}},
+      data: { datasets: [{ backgroundColor: CHART_DEFAULT_COLORS, tooltips: [] }] }
+    };
+    this._chart = new Chart(elem.find('canvas')[0].getContext('2d'), chartConfig);
+  },
+
+  handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
+    var relayAddresses = Object.keys(statistics['counts'].relays);
+
+    /* Sort relays by address */
+    relayAddresses.sort();
+
+    var relayNames = [];
+    var relayTradeCounts = [];
+
+    for (var i = 0; i < relayAddresses.length; i++) {
+      if (web3.toDecimal(relayAddresses[i]) == 0)
+        continue;
+
+      relayNames.push(this._view.formatRelay(relayAddresses[i]));
+      relayTradeCounts.push(statistics['counts'].relays[relayAddresses[i]]);
+    }
+
+    this._chart.data.labels = relayNames;
+    this._chart.data.datasets[0].data = relayTradeCounts;
+    this._chart.update();
+  },
+});
+
+/******************************************************************************/
 /* PriceChartPanel */
 /******************************************************************************/
 
@@ -756,5 +810,6 @@ PanelList = [
   ["Token Pairs Chart", TokenPairsChartPanel],
   ["Fee vs. Feeless Chart", FeeFeelessChartPanel],
   ["Relay Fee Chart", RelayFeeChartPanel],
+  ["Relay Trades Chart", RelayTradesChartPanel],
   ["Price Chart", PriceChartPanel],
 ];
