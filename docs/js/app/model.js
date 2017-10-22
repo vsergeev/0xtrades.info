@@ -270,6 +270,7 @@ Model.prototype = {
     var statistics = {
         'fees': {totalFees: new web3.BigNumber(0), relays: {}, feeCount: 0, feelessCount: 0},
         'volume': {totalTrades: 0, totalVolumeFiat: new web3.BigNumber(0), tokens: {}},
+        'counts': {relays: {}},
     };
 
     for (var i = 0; i < this._trades.length; i++) {
@@ -294,6 +295,13 @@ Model.prototype = {
         statistics['fees'].feeCount += 1;
       else
         statistics['fees'].feelessCount += 1;
+
+      /*** Trades per relay ***/
+
+      if (statistics['counts'].relays[relayAddress] == undefined)
+        statistics['counts'].relays[relayAddress] = 0;
+
+      statistics['counts'].relays[relayAddress] += 1;
 
       /*** Token volume and count statistics ***/
 
