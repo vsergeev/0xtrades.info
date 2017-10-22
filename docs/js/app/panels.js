@@ -646,7 +646,12 @@ RelayFeeChartPanel.prototype = derive(Panel, {
 
       relayNames.push(this._view.formatRelay(relayAddresses[i]));
       relayFees.push(statistics['fees'].relays[relayAddresses[i]].toNumber());
-      relayFeesFormatted.push(statistics['fees'].relays[relayAddresses[i]].toDigits(6) + " ZRX");
+
+      var formattedFee = statistics['fees'].relays[relayAddresses[i]].toDigits(6) + " ZRX"
+      if (statistics['fees'].zrxPrice)
+        formattedFee += " (" + this._view.formatPrice(statistics['fees'].relays[relayAddresses[i]].mul(statistics['fees'].zrxPrice)) + ")";
+
+      relayFeesFormatted.push(formattedFee);
     }
 
     this._chart.data.labels = relayNames;
