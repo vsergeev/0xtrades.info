@@ -605,7 +605,7 @@ FeeFeelessChartPanel.prototype = derive(Panel, {
 
 var RelayFeeChartPanel = function (view) {
   Panel.call(this, view);
-  this._title = "Relay Fee Distribution (24 hr)";
+  this._title = "Relay Fees (24 hr)";
 };
 
 RelayFeeChartPanel.prototype = derive(Panel, {
