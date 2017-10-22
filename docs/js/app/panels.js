@@ -246,7 +246,7 @@ RecentTradesPanel.prototype = derive(Panel, {
               <th>Time (UTC)</th>
               <th>Txid</th>
               <th>Trade</th>
-              <th>Price (<span class="m_t">M:T</span><span class="t_m" style="display:none;">T:M</span><i class="icon-exchange price-invert"></i>)</th>
+              <th>Price (<i class="icon-exchange price-invert"></i>)</th>
               <th>Relay</th>
               <th>Maker Fee</th>
               <th>Taker Fee</th>
@@ -297,16 +297,28 @@ RecentTradesPanel.prototype = derive(Panel, {
                 .append($(trade.takerNormalized ? "<span></span>" : "<i></i>").text(trade.takerVolume.toDigits(6) + " "))
                 .append(this._view.formatTokenLink(trade.takerToken));
 
+    /* Prefer WETH in the numerator for non-inverted price */
+    if (ZEROEX_TOKEN_INFOS[trade.makerToken] && ZEROEX_TOKEN_INFOS[trade.makerToken].symbol == "WETH") {
+      var price1 = trade.mtPrice ? trade.mtPrice : null;
+      var price2 = trade.tmPrice ? trade.tmPrice : null;
+    } else if (ZEROEX_TOKEN_INFOS[trade.takerToken] && ZEROEX_TOKEN_INFOS[trade.takerToken].symbol == "WETH") {
+      var price1 = trade.tmPrice ? trade.tmPrice : null;
+      var price2 = trade.mtPrice ? trade.mtPrice : null;
+    } else {
+      var price1 = trade.mtPrice ? trade.mtPrice : null;
+      var price2 = trade.tmPrice ? trade.tmPrice : null;
+    }
+
     /* Format price */
     var price = $("<span></span>")
                   .append($("<span></span>")
                             .toggle(!this._priceInverted)
-                            .addClass("m_t")
-                            .text(trade.mtPrice ? trade.mtPrice.toDigits(6) : "Unknown"))
+                            .addClass("price1")
+                            .text(price1 ? price1.toDigits(8) : "Unknown"))
                   .append($("<span></span>")
                             .toggle(this._priceInverted)
-                            .addClass("t_m")
-                            .text(trade.tmPrice ? trade.tmPrice.toDigits(6) : "Unknown"));
+                            .addClass("price2")
+                            .text(price2 ? price2.toDigits(8) : "Unknown"));
 
     /* Create row for trade list */
     var elem = $('<tr></tr>')
@@ -337,8 +349,8 @@ RecentTradesPanel.prototype = derive(Panel, {
 
   handlePriceInvert: function () {
     this._priceInverted = !this._priceInverted;
-    this._root.find('.t_m').toggle()
-    this._root.find('.m_t').toggle()
+    this._root.find('.price1').toggle()
+    this._root.find('.price2').toggle()
   },
 
   handleFetchMore: function () {
