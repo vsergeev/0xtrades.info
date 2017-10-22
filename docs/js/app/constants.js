@@ -56,6 +56,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "PPT",
       decimals: 8,
     },
+    "0xab16e0d25c06cb376259cc18c1de4aca57605589": {
+      name: "FinallyUsableCryptoKarma",
+      symbol: "FUCK",
+      decimals: 4,
+    },
 };
 
 /* Populated by model */
