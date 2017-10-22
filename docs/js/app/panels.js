@@ -491,6 +491,77 @@ TokenOccurrenceChartPanel.prototype = derive(Panel, {
 });
 
 /******************************************************************************/
+/* TokenPairsChartPanel */
+/******************************************************************************/
+
+var TokenPairsChartPanel = function (view) {
+  Panel.call(this, view);
+  this._title = "Token Pairs (24 hr)";
+};
+
+TokenPairsChartPanel.prototype = derive(Panel, {
+  constructor: TokenPairsChartPanel,
+
+  create: function (root) {
+    Panel.prototype.create.call(this, root);
+
+    var elem = $(`
+      <div class="row canvas-wrapper text-center">
+        <canvas width="400" height="400"></canvas>
+      </div>
+    `);
+
+    this._root.find(".panel-content").append(elem);
+
+    var chartConfig = {
+      type: 'pie',
+      options: {responsive: true, tooltips: {callbacks: {label: CHART_DEFAULT_TOOLTIP_CALLBACK}}},
+      data: { datasets: [{ backgroundColor: CHART_DEFAULT_COLORS, tooltips: [] }] }
+    };
+    this._chart = new Chart(elem.find('canvas')[0].getContext('2d'), chartConfig);
+  },
+
+  handleNewTradeEvent: function (index, trade, tradeHistory) {
+    var tokenPairCounts = {};
+
+    for (var i = 0; i < tradeHistory.length; i++) {
+      if (tradeHistory[i].makerNormalized && tradeHistory[i].takerNormalized) {
+        var symbols = [ZEROEX_TOKEN_INFOS[tradeHistory[i].makerToken].symbol,
+                       ZEROEX_TOKEN_INFOS[tradeHistory[i].takerToken].symbol];
+        var pair;
+
+        /* Assemble pair, preferring WETH as base currency */
+        if (symbols[0] == "WETH")
+          pair = symbols[1] + "/" + symbols[0];
+        else if (symbols[1] == "WETH")
+          pair = symbols[0] + "/" + symbols[1];
+        else if (symbols[0] < symbols[1])
+          pair = symbols[0] + "/" + symbols[1];
+        else
+          pair = symbols[1] + "/" + symbols[0];
+
+        if (tokenPairCounts[pair])
+          tokenPairCounts[pair] += 1;
+        else
+          tokenPairCounts[pair] = 1;
+      }
+    }
+
+    var pairNames = [];
+    var pairCounts = [];
+
+    for (var pair in tokenPairCounts) {
+      pairNames.push(pair);
+      pairCounts.push(tokenPairCounts[pair]);
+    }
+
+    this._chart.data.labels = pairNames;
+    this._chart.data.datasets[0].data = pairCounts;
+    this._chart.update();
+  },
+});
+
+/******************************************************************************/
 /* FeeFeelessChartPanel */
 /******************************************************************************/
 
@@ -682,6 +753,7 @@ PanelList = [
   ["Recent Trades", RecentTradesPanel],
   ["Token Volume Chart", TokenVolumeChartPanel],
   ["Token Occurrence Chart", TokenOccurrenceChartPanel],
+  ["Token Pairs Chart", TokenPairsChartPanel],
   ["Fee vs. Feeless Chart", FeeFeelessChartPanel],
   ["Relay Fee Chart", RelayFeeChartPanel],
   ["Price Chart", PriceChartPanel],
