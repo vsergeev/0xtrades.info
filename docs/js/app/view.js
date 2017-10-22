@@ -193,13 +193,24 @@ View.prototype = {
 
   /* Formatting Helpers */
 
-  formatDateTime: function (datetime) {
-    var year = datetime.getUTCFullYear();
-    var month = ((datetime.getUTCMonth()+1) < 10) ? ("0" + (datetime.getUTCMonth()+1)) : (datetime.getUTCMonth()+1);
-    var day = (datetime.getUTCDate() < 10) ? ("0" + datetime.getUTCDate()) : datetime.getUTCDate();
-    var hours = (datetime.getUTCHours() < 10) ? ("0" + datetime.getUTCHours()) : datetime.getUTCHours();
-    var minutes = (datetime.getUTCMinutes() < 10) ? ("0" + datetime.getUTCMinutes()) : datetime.getUTCMinutes();
-    var seconds = (datetime.getUTCSeconds() < 10) ? ("0" + datetime.getUTCSeconds()) : datetime.getUTCSeconds();
+  formatDateTime: function (datetime, local) {
+    var year, month, day, hours, minutes, seconds;
+
+    if (local) {
+      year = datetime.getFullYear();
+      month = ((datetime.getMonth()+1) < 10) ? ("0" + (datetime.getMonth()+1)) : (datetime.getMonth()+1);
+      day = (datetime.getDate() < 10) ? ("0" + datetime.getDate()) : datetime.getDate();
+      hours = (datetime.getHours() < 10) ? ("0" + datetime.getHours()) : datetime.getHours();
+      minutes = (datetime.getMinutes() < 10) ? ("0" + datetime.getMinutes()) : datetime.getMinutes();
+      seconds = (datetime.getSeconds() < 10) ? ("0" + datetime.getSeconds()) : datetime.getSeconds();
+    } else {
+      year = datetime.getUTCFullYear();
+      month = ((datetime.getUTCMonth()+1) < 10) ? ("0" + (datetime.getUTCMonth()+1)) : (datetime.getUTCMonth()+1);
+      day = (datetime.getUTCDate() < 10) ? ("0" + datetime.getUTCDate()) : datetime.getUTCDate();
+      hours = (datetime.getUTCHours() < 10) ? ("0" + datetime.getUTCHours()) : datetime.getUTCHours();
+      minutes = (datetime.getUTCMinutes() < 10) ? ("0" + datetime.getUTCMinutes()) : datetime.getUTCMinutes();
+      seconds = (datetime.getUTCSeconds() < 10) ? ("0" + datetime.getUTCSeconds()) : datetime.getUTCSeconds();
+    }
 
     return year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
   },

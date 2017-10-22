@@ -243,7 +243,7 @@ RecentTradesPanel.prototype = derive(Panel, {
         <table class="table table-responsive table-condensed table-sm borderless recent-trades">
           <thead>
             <tr>
-              <th>Time (UTC)</th>
+              <th>Time (<span class="time-utc">UTC</span><span class="time-local" style="display:none">Local</span><i class="icon-exchange time-switch"></i>)</th>
               <th>Txid</th>
               <th>Trade</th>
               <th>Price (<i class="icon-exchange price-invert"></i>)</th>
@@ -263,11 +263,13 @@ RecentTradesPanel.prototype = derive(Panel, {
       </div>
     `);
 
-    elem.find('i').click(this.handlePriceInvert.bind(this));
+    elem.find('i.time-switch').click(this.handleTimeSwitch.bind(this));
+    elem.find('i.price-invert').click(this.handlePriceInvert.bind(this));
     elem.find('button').click(this.handleFetchMore.bind(this));
 
     this._root.find('.panel-content').append(elem);
 
+    this._timeLocal = false;
     this._priceInverted = false;
     this._initialized = false;
   },
@@ -286,8 +288,17 @@ RecentTradesPanel.prototype = derive(Panel, {
   },
 
   addNewTrade: function (index, trade) {
-    /* Format time stamp */
-    var timestamp = this._view.formatDateTime(new Date(trade.timestamp*1000));
+    /* Format timestamp */
+    var timestamp = new Date(trade.timestamp*1000);
+    var timestamp = $("<span></span>")
+                      .append($("<span></span>")
+                                .toggle(!this._timeLocal)
+                                .addClass("time-utc")
+                                .text(this._view.formatDateTime(timestamp, false)))
+                      .append($("<span></span>")
+                                .toggle(this._timeLocal)
+                                .addClass("time-local")
+                                .text(this._view.formatDateTime(timestamp, true)));
 
     /* Format trade string */
     var swap = $("<span></span>")
@@ -323,7 +334,7 @@ RecentTradesPanel.prototype = derive(Panel, {
     /* Create row for trade list */
     var elem = $('<tr></tr>')
                 .append($('<td></td>')      /* Time */
-                          .text(timestamp))
+                          .html(timestamp))
                 .append($('<td></td>')      /* Transaction ID */
                           .html(this._view.formatTxidLink(trade.txid, this._view.formatHex(trade.txid, 8))))
                 .append($('<td></td>')      /* Trade */
@@ -351,6 +362,12 @@ RecentTradesPanel.prototype = derive(Panel, {
     this._priceInverted = !this._priceInverted;
     this._root.find('.price1').toggle()
     this._root.find('.price2').toggle()
+  },
+
+  handleTimeSwitch: function () {
+    this._priceSwitched = !this._priceSwitched;
+    this._root.find('.time-utc').toggle()
+    this._root.find('.time-local').toggle()
   },
 
   handleFetchMore: function () {

@@ -170,6 +170,10 @@ div.panel-header:hover .panel-close {
   cursor: pointer;
 }
 
+.recent-trades .time-switch {
+  cursor: pointer;
+}
+
 .recent-trades-fetch-more {
   font-size: 1.0rem;
   margin-bottom: 1rem;
