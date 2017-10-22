@@ -61,6 +61,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "FUCK",
       decimals: 4,
     },
+    "0x0e0989b1f9b8a38983c2ba8053269ca62ec9b195": {
+      name: "Po.et",
+      symbol: "POE",
+      decimals: 8,
+    },
 };
 
 /* Populated by model */
