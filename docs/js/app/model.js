@@ -455,10 +455,6 @@ Model.prototype = {
         return self.fetchPastTradesDuration(duration);
     });
   },
-
-  getPriceVolumeHistory: function () {
-    return this._priceVolumeHistory;
-  },
 };
 
 /******************************************************************************/

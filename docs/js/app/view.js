@@ -39,7 +39,6 @@ var View = function () {
 
   /* Callbacks to model */
   this.fetchMoreCallback = null;
-  this.getPriceVolumeHistoryCallback = null;
 };
 
 View.prototype = {
