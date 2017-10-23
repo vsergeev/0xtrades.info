@@ -336,6 +336,7 @@ RecentTradesPanel.prototype = derive(Panel, {
 
     /* Create row for trade list */
     var elem = $('<tr></tr>')
+                .addClass('trade')
                 .append($('<td></td>')      /* Expand */
                           .append($("<i></i>").addClass("icon-right-dir").addClass("more-info"))
                           .append($("<i></i>").addClass("icon-down-dir").addClass("more-info").toggle(false)))
@@ -360,10 +361,12 @@ RecentTradesPanel.prototype = derive(Panel, {
     elem.find(".more-info").click(this.handleClick.bind(this, elem, trade));
 
     /* Add to trade list */
-    if (this._root.find("tbody").children().length == 0)
-      this._root.find("tbody").append(elem);
+    if (this._root.find("table.recent-trades tbody").children().length == 0)
+      this._root.find("table.recent-trades tbody").append(elem);
+    else if (index == 0)
+      this._root.find("table.recent-trades tbody tr.trade").eq(0).before(elem);
     else
-      this._root.find("tr").eq(index).after(elem);
+      this._root.find("table.recent-trades tbody tr.trade").eq(index-1).after(elem);
   },
 
   handleClick: function (dom, trade) {
