@@ -369,8 +369,8 @@ RecentTradesPanel.prototype = derive(Panel, {
   handleClick: function (dom, trade) {
     dom.find(".more-info").toggle();
 
-    if (this._tradeMoreInfos[trade.orderHash]) {
-      this._tradeMoreInfos[trade.orderHash].toggle();
+    if (this._tradeMoreInfos[trade.txid + trade.orderHash]) {
+      this._tradeMoreInfos[trade.txid + trade.orderHash].toggle();
     } else {
       var table = $(`
         <table class="table table-responsive table-condensed table-sm borderless trade-more-info">
@@ -426,7 +426,7 @@ RecentTradesPanel.prototype = derive(Panel, {
                             .append(table));
 
       dom.after(elem);
-      this._tradeMoreInfos[trade.orderHash] = elem;
+      this._tradeMoreInfos[trade.txid + trade.orderHash] = elem;
     }
   },
 
