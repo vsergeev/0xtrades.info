@@ -240,7 +240,7 @@ RecentTradesPanel.prototype = derive(Panel, {
 
     var elem = $(`
       <div class="row">
-        <table class="table table-responsive table-condensed table-sm borderless recent-trades">
+        <table class="table table-responsive table-condensed table-sm recent-trades">
           <thead>
             <tr>
               <th>Time (<span class="time-utc">UTC</span><span class="time-local" style="display:none">Local</span><i class="icon-exchange time-switch"></i>)</th>
