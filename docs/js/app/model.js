@@ -60,6 +60,10 @@ Model.prototype = {
   init: function () {
     var self = this;
 
+    /* Configure web3's BigNumber to format large numbers (e.g. salts) in
+     * decimal correctly */
+    web3.BigNumber.config({EXPONENTIAL_AT: 100});
+
     /* Look up network id */
     self._web3.version.getNetwork(function (error, result) {
       if (error) {
@@ -174,7 +178,19 @@ Model.prototype = {
         });
       }
     })
+  },
 
+  getTransaction: function (txid) {
+    var self = this;
+
+    return new Promise(function (resolve, reject) {
+      self._web3.eth.getTransaction(txid, function (error, result) {
+        if (error)
+          reject(error)
+        else
+          resolve(result);
+      });
+    });
   },
 
   /* Blockchain event handlers */
@@ -453,6 +469,98 @@ Model.prototype = {
     }).then(function (recheck) {
       if (recheck)
         return self.fetchPastTradesDuration(duration);
+    });
+  },
+
+  fetchOrder: function (trade) {
+    var self = this;
+    return this.getTransaction(trade.txid).then(function (result) {
+      /* FIXME this all should really use an abi decoder */
+
+      var methodId = result.input.substring(0, 10);
+
+      /* Only support fillOrder() method for now */
+      if (methodId != "0xbc61394a")
+        return {error: "Unsupported fill method."};
+      else if (result.length < 1034)
+        return {error: "Unsupported fill method."};
+
+      /* Extract 15 params from the input data */
+      var params = [];
+      for (var i = 10; i < 1034; i+= 64)
+        params.push(result.input.substring(i, i+64));
+
+      /* Form 0x.js order object */
+      var order = {};
+      order.exchangeContractAddress = ZEROEX_EXCHANGE_ADDRESS;
+      order.expirationUnixTimestampSec = web3.toBigNumber("0x" + params[9]);
+      order.feeRecipient = "0x" + params[4].substring(24);
+      order.maker = "0x" + params[0].substring(24);
+      order.makerFee = web3.toBigNumber("0x" + params[7]);
+      order.makerTokenAddress = "0x" + params[2].substring(24);
+      order.makerTokenAmount = web3.toBigNumber("0x" + params[5]);
+      order.salt = web3.toBigNumber("0x" + params[10]);
+      order.taker = "0x" + params[1].substring(24);
+      order.takerFee = web3.toBigNumber("0x" + params[8]);
+      order.takerTokenAddress = "0x" + params[3].substring(24);
+      order.takerTokenAmount = web3.toBigNumber("0x" + params[6]);
+
+      /* Calculate order hash */
+      var orderHash = ZeroEx.ZeroEx.getOrderHashHex(order);
+
+      /* Form 0x portal order object */
+      var portalOrder = {maker: {token: {}}, taker: {token: {}}, signature: {}};
+      portalOrder.maker.address = order.maker;
+      portalOrder.maker.token.address = order.makerTokenAddress;
+      portalOrder.maker.token.name = ZEROEX_TOKEN_INFOS[portalOrder.maker.token.address] ? ZEROEX_TOKEN_INFOS[portalOrder.maker.token.address].name : null;
+      portalOrder.maker.token.symbol = ZEROEX_TOKEN_INFOS[portalOrder.maker.token.address] ? ZEROEX_TOKEN_INFOS[portalOrder.maker.token.address].symbol : null;
+      portalOrder.maker.token.decimals = ZEROEX_TOKEN_INFOS[portalOrder.maker.token.address] ? ZEROEX_TOKEN_INFOS[portalOrder.maker.token.address].decimals : null;
+      portalOrder.maker.amount = order.makerTokenAmount.toString();
+      portalOrder.maker.feeAmount = order.makerFee.toString();
+      portalOrder.taker.address = (web3.toDecimal(order.taker) == 0) ? "" : order.taker;
+      portalOrder.taker.token.address = order.takerTokenAddress;
+      portalOrder.taker.token.name = ZEROEX_TOKEN_INFOS[portalOrder.taker.token.address] ? ZEROEX_TOKEN_INFOS[portalOrder.taker.token.address].name : null;
+      portalOrder.taker.token.symbol = ZEROEX_TOKEN_INFOS[portalOrder.taker.token.address] ? ZEROEX_TOKEN_INFOS[portalOrder.taker.token.address].symbol : null;
+      portalOrder.taker.token.decimals = ZEROEX_TOKEN_INFOS[portalOrder.taker.token.address] ? ZEROEX_TOKEN_INFOS[portalOrder.taker.token.address].decimals : null;
+      portalOrder.taker.amount = order.takerTokenAmount.toString();
+      portalOrder.taker.feeAmount = order.takerFee.toString();
+      portalOrder.expiration = order.expirationUnixTimestampSec.toString();
+      portalOrder.feeRecipient = order.feeRecipient;
+      portalOrder.salt = order.salt.toString();
+      portalOrder.signature.v = web3.toDecimal("0x" + params[13]);
+      portalOrder.signature.r = "0x" + params[14];
+      portalOrder.signature.s = "0x" + params[15];
+      portalOrder.signature.hash = orderHash;
+      portalOrder.exchangeContract = order.exchangeContractAddress;
+      portalOrder.networkId = web3.toDecimal(self._networkId);
+
+      /* Check order hash matches actual trade */
+      if (portalOrder.signature.hash != trade.orderHash) {
+        Logger.log("[Model] Order hash mismatch in fetch order.");
+        Logger.log(params);
+        Logger.log(order);
+        Logger.log(trade);
+        Logger.log(zeroExOrder);
+        return {error: "Decoding order: Order hash mismatch."};
+      }
+
+      /* Calculate taker amount remaining */
+      return self._zeroEx.exchange.getUnavailableTakerAmountAsync(portalOrder.signature.hash).then(function (result) {
+        var isOpenTaker = portalOrder.taker.address.length == 0;
+        var isExpired = order.expirationUnixTimestampSec.lt(Math.round((new Date()).getTime() / 1000));
+        var [takerAmountRemaining, takerAmountRemainingNormalized] = self.normalizeQuantity(portalOrder.taker.token.address, order.takerTokenAmount.sub(result));
+
+        return {
+          order: portalOrder,
+          isOpenTaker: isOpenTaker,
+          isExpired: isExpired,
+          takerAmountRemaining: takerAmountRemaining,
+          takerAmountRemainingNormalized: takerAmountRemainingNormalized,
+          error: null
+        };
+      });
+    }).catch(function (error) {
+      return {error: error};
     });
   },
 };
