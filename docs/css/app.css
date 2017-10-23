@@ -148,7 +148,7 @@ div.panel-header:hover .panel-close {
   font-size: 0.8rem;
 }
 
-.recent-trades table {
+table.recent-trades {
   margin-bottom: 0.5rem;
 }
 
@@ -187,8 +187,9 @@ div.panel-header:hover .panel-close {
   margin-bottom: 1rem;
 }
 
-.trade-more-info {
+table.trade-more-info {
   table-layout: auto;
+  margin-bottom: 0;
 }
 
 .trade-more-info tr th {
