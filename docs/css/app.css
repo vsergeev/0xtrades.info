@@ -194,6 +194,31 @@ table.trade-more-info {
 
 .trade-more-info tr th {
   width: 1%;
+  vertical-align: top;
+}
+
+.trade-more-info button.fetch-order {
+  line-height: 0.7rem;
+  font-size: 0.8rem;
+}
+
+.trade-more-info pre.order-json {
+  display: inline-block;
+  margin: 0;
+  padding: 0.5rem;
+  border: 1px dashed #999;
+  font-size: 0.6rem;
+  border-radius: 0.5rem;
+}
+
+.trade-more-info div.fill-order {
+  margin-top: 0.25rem;
+}
+
+.trade-more-info .fill-order a {
+  line-height: 0.7rem;
+  font-size: 0.8rem;
+  color: #fff;
 }
 
 /******************************************************************************/

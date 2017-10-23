@@ -386,6 +386,7 @@ RecentTradesPanel.prototype = derive(Panel, {
             <tr><th>Maker Fee</th><td></td></tr>
             <tr><th>Taker Fee</th><td></td></tr>
             <tr><th>Order Hash</th><td></td></tr>
+            <tr><th>Order JSON</th><td><button type="button" class="btn btn-sm btn-info fetch-order">Fetch Order</button></td></tr>
           </tbody>
         </table>
       `);
@@ -419,6 +420,8 @@ RecentTradesPanel.prototype = derive(Panel, {
       /* Order Hash */
       table.find('td').eq(10).text(trade.orderHash);
 
+      table.find('button').click(this.handleFetchOrder.bind(this, table, trade));
+
       var elem = $('<tr></tr>')
                   .append($('<td></td>'))
                   .append($('<td></td>')
@@ -428,6 +431,54 @@ RecentTradesPanel.prototype = derive(Panel, {
       dom.after(elem);
       this._tradeMoreInfos[trade.txid + trade.orderHash] = elem;
     }
+  },
+
+  handleFetchOrder: function (dom, trade) {
+    var self = this;
+    this._view.fetchOrderCallback(trade).then(function (result) {
+      /* Render an error */
+      if (result.error) {
+        var elem = $('<b></b>').addClass('text-danger').text("Error: " + result.error);
+        dom.find('td').eq(11).html(elem);
+        return;
+      }
+
+      /* Render JSON */
+      var elem = $('<div></div').append($('<pre></pre>').addClass('mono order-json').text(JSON.stringify(result.order, null, 2)));
+
+      /* Add error if the order has been filled or show remaining taker amount */
+      if (result.takerAmountRemaining.eq(0)) {
+        elem.append($('<div></div>').append($('<b></b>').addClass('text-danger').text("This order has already been filled.")));
+      } else {
+        elem.append($('<div></div>').append($('<b></b>')
+                                              .addClass('text-info')
+                                              .text("Remaining taker amount: ")
+                                              .append($(result.takerAmountRemainingNormalized ? "<span></span>" : "<i></i>")
+                                                        .text(result.takerAmountRemaining + " "))
+                                              .append(self._view.formatToken(trade.takerToken, 64))
+                                              .append('.')));
+      }
+
+      /* Add warning if the order does not have an open taker */
+      if (!result.isOpenTaker)
+        elem.append($('<div></div>').append($('<b></b>').addClass('text-danger').text("Warning: this order has a specified taker.")));
+
+      /* Add error if the order is expired */
+      if (result.isExpired)
+        elem.append($('<div></div>').append($('<b></b>').addClass('text-danger').text("This order has expired.")));
+
+      /* Add fill order button */
+      elem.append($('<div></div>')
+                    .addClass('fill-order')
+                    .append($('<a></a>')
+                              .attr('href', ZEROEX_PORTAL_URL + "/fill?order=" + encodeURIComponent(JSON.stringify(result.order)))
+                              .attr('target', '_blank')
+                              .addClass('btn btn-sm btn-info')
+                              .toggleClass('disabled', result.takerAmountRemaining.eq(0) || result.isExpired)
+                              .text('Fill Order')));
+
+      dom.find('td').eq(11).html(elem);
+    });
   },
 
   handlePriceInvert: function () {

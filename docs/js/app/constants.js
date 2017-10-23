@@ -105,6 +105,8 @@ var PRICE_API_URL = function (symbols, base) {
 
 var INFURA_API_URL = "https://mainnet.infura.io/rdkuEWbeKAjSR9jZ6P1h";
 
+var ZEROEX_PORTAL_URL = "https://0xproject.com/portal";
+
 var STATISTICS_TIME_WINDOW = 86400; /* 24 hours */
 
 var BLOCK_FETCH_COUNT = Math.ceil(STATISTICS_TIME_WINDOW/17);
