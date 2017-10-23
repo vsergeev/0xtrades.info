@@ -312,6 +312,24 @@ View.prototype = {
     }
   },
 
+  formatBlockNumberLink: function (number, showLinkIcon) {
+    var baseUrl = NETWORK_BLOCK_EXPLORER[this._networkId];
+
+    if (baseUrl) {
+      var elem = $('<a></a>')
+                 .attr('href', baseUrl + "/block/" + number)
+                 .attr('target', '_blank')
+                 .text(number);
+
+      if (showLinkIcon)
+        elem = elem.append($('<i></i>').addClass('icon-link-ext'));
+
+      return elem;
+    } else {
+      return text;
+    }
+  },
+
   /* Success/failure Modal */
 
   showResultModal: function (success, heading, body) {
