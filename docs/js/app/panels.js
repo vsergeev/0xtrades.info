@@ -385,7 +385,7 @@ RecentTradesPanel.prototype = derive(Panel, {
             <tr><th>Taker Amount</th><td></td></tr>
             <tr><th>Maker Fee</th><td></td></tr>
             <tr><th>Taker Fee</th><td></td></tr>
-            <tr><th>Order hash</th><td></td></tr>
+            <tr><th>Order Hash</th><td></td></tr>
           </tbody>
         </table>
       `);
