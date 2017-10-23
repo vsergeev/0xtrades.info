@@ -160,7 +160,7 @@ VolumeStatisticsPanel.prototype = derive(Panel, {
 
     var elem = $(`
       <div class="row">
-        <table class="table table-condensed table-sm borderless volume-statistics">
+        <table class="table table-condensed table-sm volume-statistics">
           <tbody>
           </tbody>
         </table>
