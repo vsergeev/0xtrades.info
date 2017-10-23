@@ -239,6 +239,14 @@ View.prototype = {
     }
   },
 
+  formatToken: function (address, digits) {
+    if (ZEROEX_TOKEN_INFOS[address]) {
+      return ZEROEX_TOKEN_INFOS[address].symbol;
+    } else {
+      return this.formatHex(address, digits);
+    }
+  },
+
   formatTokenLink: function (address, digits) {
     if (ZEROEX_TOKEN_INFOS[address]) {
       return this.formatAddressLink(address, ZEROEX_TOKEN_INFOS[address].symbol);
