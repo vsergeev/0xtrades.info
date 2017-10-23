@@ -538,9 +538,9 @@ Model.prototype = {
       if (portalOrder.signature.hash != trade.orderHash) {
         Logger.log("[Model] Order hash mismatch in fetch order.");
         Logger.log(params);
-        Logger.log(order);
         Logger.log(trade);
-        Logger.log(zeroExOrder);
+        Logger.log(order);
+        Logger.log(portalOrder);
         return {error: "Decoding order: Order hash mismatch."};
       }
 
