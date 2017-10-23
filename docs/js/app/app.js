@@ -56,6 +56,7 @@ Controller.prototype = {
 
     /* Bind view -> model */
     this.view.fetchMoreCallback = this.model.fetchPastTrades.bind(this.model);
+    this.view.fetchOrderCallback = this.model.fetchOrder.bind(this.model);
 
     /* Initialize view */
     this.view.init();

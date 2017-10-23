@@ -39,6 +39,7 @@ var View = function () {
 
   /* Callbacks to model */
   this.fetchMoreCallback = null;
+  this.fetchOrderCallback = null;
 };
 
 View.prototype = {
