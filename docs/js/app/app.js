@@ -24,6 +24,21 @@
  */
 
 /******************************************************************************/
+/* Logger */
+/******************************************************************************/
+
+Logger = {
+  enable: function () { Logger.log = Logger._log_console; },
+  disable: function () { Logger.log = Logger._log_null; },
+
+  _log_console: console.log.bind(window.console),
+  _log_null: function (s) { },
+
+  log: null,
+  error: console.error.bind(window.console),
+};
+
+/******************************************************************************/
 /* Controller */
 /******************************************************************************/
 
