@@ -230,6 +230,8 @@ VolumeStatisticsPanel.prototype = derive(Panel, {
 var RecentTradesPanel = function (view) {
   Panel.call(this, view);
   this._title = "Recent Trades";
+
+  this._tradeMoreInfos = {};
 };
 
 RecentTradesPanel.prototype = derive(Panel, {
@@ -243,6 +245,7 @@ RecentTradesPanel.prototype = derive(Panel, {
         <table class="table table-responsive table-condensed table-sm recent-trades">
           <thead>
             <tr>
+              <th></th>
               <th>Time (<span class="time-utc">UTC</span><span class="time-local" style="display:none">Local</span><i class="icon-exchange time-switch"></i>)</th>
               <th>Txid</th>
               <th>Trade</th>
@@ -333,6 +336,9 @@ RecentTradesPanel.prototype = derive(Panel, {
 
     /* Create row for trade list */
     var elem = $('<tr></tr>')
+                .append($('<td></td>')      /* Expand */
+                          .append($("<i></i>").addClass("icon-right-dir").addClass("more-info"))
+                          .append($("<i></i>").addClass("icon-down-dir").addClass("more-info").toggle(false)))
                 .append($('<td></td>')      /* Time */
                           .html(timestamp))
                 .append($('<td></td>')      /* Transaction ID */
@@ -351,11 +357,77 @@ RecentTradesPanel.prototype = derive(Panel, {
                           .addClass('overflow-sm')
                           .text(trade.takerFee.toDigits(6) + " ZRX"));
 
+    elem.find(".more-info").click(this.handleClick.bind(this, elem, trade));
+
     /* Add to trade list */
     if (this._root.find("tbody").children().length == 0)
       this._root.find("tbody").append(elem);
     else
       this._root.find("tr").eq(index).after(elem);
+  },
+
+  handleClick: function (dom, trade) {
+    dom.find(".more-info").toggle();
+
+    if (this._tradeMoreInfos[trade.orderHash]) {
+      this._tradeMoreInfos[trade.orderHash].toggle();
+    } else {
+      var table = $(`
+        <table class="table table-responsive table-condensed table-sm borderless trade-more-info">
+          <tbody>
+            <tr><th>Transaction ID</th><td></td></tr>
+            <tr><th>Block Number</th><td></td></tr>
+            <tr><th>Timestamp</th><td></td></tr>
+            <tr><th>Maker Address</th><td></td></tr>
+            <tr><th>Taker Address</th><td></td></tr>
+            <tr><th>Relay Address</th><td></td></tr>
+            <tr><th>Maker Amount</th><td></td></tr>
+            <tr><th>Taker Amount</th><td></td></tr>
+            <tr><th>Maker Fee</th><td></td></tr>
+            <tr><th>Taker Fee</th><td></td></tr>
+            <tr><th>Order hash</th><td></td></tr>
+          </tbody>
+        </table>
+      `);
+
+      /* Transaction ID */
+      table.find('td').eq(0).html(this._view.formatTxidLink(trade.txid, trade.txid));
+      /* Block number */
+      table.find('td').eq(1).html(this._view.formatBlockNumberLink(trade.blockNumber));
+      /* Timestamp */
+      table.find('td').eq(2).text((new Date(trade.timestamp*1000)).toUTCString());
+      /* Maker Address */
+      table.find('td').eq(3).html(this._view.formatAddressLink(trade.makerAddress, trade.makerAddress));
+      /* Taker Address */
+      table.find('td').eq(4).html(this._view.formatAddressLink(trade.takerAddress, trade.takerAddress));
+      /* Relay Address */
+      table.find('td').eq(5).html(this._view.formatRelayLink(trade.relayAddress, 64));
+      /* Maker Volume/Token */
+      table.find('td').eq(6).html($("<span></span>")
+                                    .append($(trade.makerNormalized ? "<span></span>" : "<i></i>")
+                                              .text(trade.makerVolume.toDigits(6) + " "))
+                                    .append(this._view.formatTokenLink(trade.makerToken, 64)));
+      /* Taker Volume/Token */
+      table.find('td').eq(7).html($("<span></span>")
+                                    .append($(trade.takerNormalized ? "<span></span>" : "<i></i>")
+                                              .text(trade.takerVolume.toDigits(6) + " "))
+                                    .append(this._view.formatTokenLink(trade.takerToken, 64)));
+      /* Maker Fee */
+      table.find('td').eq(8).text(trade.makerFee.toDigits(6) + " ZRX");
+      /* Taker Fee */
+      table.find('td').eq(9).text(trade.takerFee.toDigits(6) + " ZRX");
+      /* Order Hash */
+      table.find('td').eq(10).text(trade.orderHash);
+
+      var elem = $('<tr></tr>')
+                  .append($('<td></td>'))
+                  .append($('<td></td>')
+                            .attr('colspan', 7)
+                            .append(table));
+
+      dom.after(elem);
+      this._tradeMoreInfos[trade.orderHash] = elem;
+    }
   },
 
   handlePriceInvert: function () {

@@ -40,6 +40,10 @@ h3 {
   margin-bottom: 1rem;
 }
 
+.borderless td, .borderless th, .borderless tr th {
+    border: none;
+}
+
 /******************************************************************************/
 
 /* Description */
@@ -166,6 +170,10 @@ div.panel-header:hover .panel-close {
   white-space: nowrap;
 }
 
+.recent-trades .more-info {
+  cursor: pointer;
+}
+
 .recent-trades .price-invert {
   cursor: pointer;
 }
@@ -177,6 +185,14 @@ div.panel-header:hover .panel-close {
 .recent-trades-fetch-more {
   font-size: 1.0rem;
   margin-bottom: 1rem;
+}
+
+.trade-more-info {
+  table-layout: auto;
+}
+
+.trade-more-info tr th {
+  width: 1%;
 }
 
 /******************************************************************************/
