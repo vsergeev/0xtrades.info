@@ -405,17 +405,17 @@ RecentTradesPanel.prototype = derive(Panel, {
       /* Maker Volume/Token */
       table.find('td').eq(6).html($("<span></span>")
                                     .append($(trade.makerNormalized ? "<span></span>" : "<i></i>")
-                                              .text(trade.makerVolume.toDigits(6) + " "))
+                                              .text(trade.makerVolume + " "))
                                     .append(this._view.formatTokenLink(trade.makerToken, 64)));
       /* Taker Volume/Token */
       table.find('td').eq(7).html($("<span></span>")
                                     .append($(trade.takerNormalized ? "<span></span>" : "<i></i>")
-                                              .text(trade.takerVolume.toDigits(6) + " "))
+                                              .text(trade.takerVolume + " "))
                                     .append(this._view.formatTokenLink(trade.takerToken, 64)));
       /* Maker Fee */
-      table.find('td').eq(8).text(trade.makerFee.toDigits(6) + " ZRX");
+      table.find('td').eq(8).text(trade.makerFee + " ZRX");
       /* Taker Fee */
-      table.find('td').eq(9).text(trade.takerFee.toDigits(6) + " ZRX");
+      table.find('td').eq(9).text(trade.takerFee + " ZRX");
       /* Order Hash */
       table.find('td').eq(10).text(trade.orderHash);
 
