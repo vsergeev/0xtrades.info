@@ -225,32 +225,36 @@ View.prototype = {
 
   formatHex: function (hex, digits) {
     digits = digits || 6;
-    return hex.substring(0, 2+digits) + "...";
+
+    if (digits >= 64)
+      return hex;
+    else
+      return hex.substring(0, 2+digits) + "...";
   },
 
-  formatRelay: function (address) {
+  formatRelay: function (address, digits) {
     if (ZEROEX_RELAY_ADDRESSES[this._networkId][address]) {
       return ZEROEX_RELAY_ADDRESSES[this._networkId][address];
     } else {
-      return this.formatHex(address);
+      return this.formatHex(address, digits);
     }
   },
 
-  formatTokenLink: function (address) {
+  formatTokenLink: function (address, digits) {
     if (ZEROEX_TOKEN_INFOS[address]) {
       return this.formatAddressLink(address, ZEROEX_TOKEN_INFOS[address].symbol);
     } else {
-      return this.formatAddressLink(address, this.formatHex(address));
+      return this.formatAddressLink(address, this.formatHex(address, digits));
     }
   },
 
-  formatRelayLink: function (address) {
+  formatRelayLink: function (address, digits) {
     if (ZEROEX_RELAY_ADDRESSES[this._networkId][address]) {
       return this.formatTokenAddressLink(ZEROEX_TOKEN_ADDRESS, address, ZEROEX_RELAY_ADDRESSES[this._networkId][address]);
     } else if (web3.toDecimal(address) == 0) {
       return $("<span></span>").text("None");
     } else {
-      return this.formatTokenAddressLink(ZEROEX_TOKEN_ADDRESS, address, this.formatHex(address));
+      return this.formatTokenAddressLink(ZEROEX_TOKEN_ADDRESS, address, this.formatHex(address, digits));
     }
   },
 
