@@ -27,6 +27,12 @@
 /* Constants */
 /******************************************************************************/
 
+var ERRORS = {
+  GET_NETWORK_ID:       1,
+  GET_BLOCK_HEIGHT:     2,
+  UNSUPPORTED_NETWORK:  3,
+};
+
 var ZEROEX_GENESIS_BLOCK = {
   1: 4145578,
   42: 4145578,

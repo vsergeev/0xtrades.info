@@ -71,27 +71,31 @@ View.prototype = {
 
   /* Event update handlers */
 
-  handleConnectedEvent: function (networkId, fiatCurrency, supported) {
+  handleConnectedEvent: function (networkId, fiatCurrency, error) {
     Logger.log('[View] Got Connected Event');
-    Logger.log('[View] Network ID: ' + networkId + ' Currency: ' + fiatCurrency + ' Supported: ' + supported);
+    Logger.log('[View] Network ID: ' + networkId + ' Currency: ' + fiatCurrency + ' Error: ' + error);
 
     this._networkId = networkId;
 
     /* Update network name in status bar */
     var networkName = NETWORK_NAME[networkId] || ("Unknown (" + networkId + ")");
 
-    if (supported) {
+    if (error == null) {
       $('#status-bar-network')
         .append($('<b></b>')
-          .addClass('text-info')
           .html(this.formatAddressLink(ZEROEX_EXCHANGE_ADDRESS, networkName, true)));
-    } else {
+    } else if (error == ERRORS.UNSUPPORTED_NETWORK) {
       $('#status-bar-network')
         .append($('<b></b>')
-          .addClass('text-info')
           .text(networkName));
 
       this.showResultModal(false, "Unsupported network", "This network is unsupported.<br><br>Please switch to Mainnet or Kovan.");
+    } else if (error) {
+      $('#status-bar-network')
+        .append($('<b></b>')
+          .text(networkName));
+
+      this.showResultModal(false, "Error", "An unknown error occurred (code " + error + ").<br><br>Please try reloading the app.");
     }
 
     this._currencyInfo = FIAT_CURRENCY_MAP[fiatCurrency];

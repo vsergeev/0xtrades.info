@@ -65,6 +65,8 @@ Model.prototype = {
       if (error) {
         Logger.log('[Model] Error determining network version');
         Logger.error(error);
+
+        self.connectedCallback(self._networkId, self._fiatCurrency, ERRORS.GET_NETWORK_ID)
       } else {
         self._networkId = result;
 
@@ -73,12 +75,14 @@ Model.prototype = {
         if (ZEROEX_GENESIS_BLOCK[self._networkId] == undefined) {
           Logger.log('[Model] Unsupported network id');
 
-          self.connectedCallback(self._networkId, self._fiatCurrency, false);
+          self.connectedCallback(self._networkId, self._fiatCurrency, ERRORS.UNSUPPORTED_NETWORK);
         } else {
           self._web3.eth.getBlockNumber(function (error, result) {
             if (error) {
               Logger.log('[Model] Error determining block height');
               Logger.error(error);
+
+              self.connectedCallback(self._networkId, self._fiatCurrency, ERRORS.GET_BLOCK_HEIGHT);
             } else {
               self._blockHeight = result
 
@@ -88,7 +92,7 @@ Model.prototype = {
               self._zeroEx.exchange.getContractAddressAsync().then(function (address) {
                 ZEROEX_EXCHANGE_ADDRESS = address;
 
-                self.connectedCallback(self._networkId, self._fiatCurrency, true);
+                self.connectedCallback(self._networkId, self._fiatCurrency, null);
 
                 /* Fetch token registry */
                 return self._zeroEx.tokenRegistry.getTokensAsync();
