@@ -491,7 +491,7 @@ RecentTradesPanel.prototype = derive(Panel, {
   },
 
   handleTimeSwitch: function () {
-    this._priceSwitched = !this._priceSwitched;
+    this._timeLocal = !this._timeLocal;
     this._root.find('.time-utc').toggle()
     this._root.find('.time-local').toggle()
   },
