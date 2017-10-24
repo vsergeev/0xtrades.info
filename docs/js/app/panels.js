@@ -467,12 +467,12 @@ RecentTradesPanel.prototype = derive(Panel, {
         elem.append($('<div></div>').append($('<b></b>').addClass('text-danger').text("Warning: this order has a specified taker.")));
 
       /* Add error if the order is expired or show expiration time */
+      var expirationDate = new Date(parseInt(result.order.expiration)*1000);
       if (result.isExpired) {
-        elem.append($('<div></div>').append($('<b></b>').addClass('text-danger').text("This order has expired.")));
+        elem.append($('<div></div>').append($('<b></b>').addClass('text-danger').text("This order expired on " + expirationDate.toUTCString() + ".")));
       } else {
-        var expirationDate = new Date(parseInt(result.order.expiration)*1000);
         if (!isNaN(expirationDate))
-          elem.append($('<div></div>').append($('<b></b>').addClass('text-info').text("This order expires at " + (expirationDate.toUTCString() + "."))));
+          elem.append($('<div></div>').append($('<b></b>').addClass('text-info').text("This order expires on " + expirationDate.toUTCString() + ".")));
       }
 
       /* Add fill order button */
