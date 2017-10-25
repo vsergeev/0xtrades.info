@@ -201,24 +201,25 @@ VolumeStatisticsPanel.prototype = derive(Panel, {
     /* Token Volumes */
     var tokens = Object.keys(statistics['volume'].tokens);
 
+    /* Filter tokens by existence in registry */
+    tokens = tokens.filter(function (token) { return ZEROEX_TOKEN_INFOS[token] != undefined; });
+
     /* Sort tokens by fiat volume */
     tokens.sort(function (a, b) {
         return statistics['volume'].tokens[a].volumeFiat.lt(statistics['volume'].tokens[b].volumeFiat);
     });
 
     for (var i = 0; i < tokens.length; i++) {
-      if (ZEROEX_TOKEN_INFOS[tokens[i]]) {
-        var volume = statistics['volume'].tokens[tokens[i]].volume.toFixed(6);
-        if (statistics['volume'].tokens[tokens[i]].volumeFiat.gt(0))
-          volume += " (" + this._view.formatPrice(statistics['volume'].tokens[tokens[i]].volumeFiat) + ")";
+      var volume = statistics['volume'].tokens[tokens[i]].volume.toFixed(6);
+      if (statistics['volume'].tokens[tokens[i]].volumeFiat.gt(0))
+        volume += " (" + this._view.formatPrice(statistics['volume'].tokens[tokens[i]].volumeFiat) + ")";
 
-        var elem = $('<tr></tr>')
-                     .append($('<th></th>')
-                              .append(this._view.formatTokenLink(tokens[i])))
-                     .append($('<td></td>')
-                               .text(volume));
-        this._root.find("tbody").first().append(elem);
-      }
+      var elem = $('<tr></tr>')
+                   .append($('<th></th>')
+                            .append(this._view.formatTokenLink(tokens[i])))
+                   .append($('<td></td>')
+                             .text(volume));
+      this._root.find("tbody").first().append(elem);
     }
   },
 });
