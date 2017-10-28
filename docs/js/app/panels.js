@@ -304,6 +304,9 @@ RecentTradesPanel.prototype = derive(Panel, {
                                 .addClass("time-local")
                                 .text(this._view.formatDateTime(timestamp, true)));
 
+    /* Add relative time tooltip */
+    timestamp.tooltip({title: function () { return moment(trade.timestamp*1000).fromNow() }, placement: "right"});
+
     /* Format trade string */
     var swap = $("<span></span>")
                 .append($(trade.makerNormalized ? "<span></span>" : "<i></i>").text(trade.makerVolume.toDigits(6) + " "))
