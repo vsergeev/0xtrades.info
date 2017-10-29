@@ -247,7 +247,7 @@ RecentTradesPanel.prototype = derive(Panel, {
           <thead>
             <tr>
               <th></th>
-              <th>Time (<span class="time-utc">UTC</span><span class="time-local" style="display:none">Local</span><i class="icon-exchange time-switch"></i>)</th>
+              <th>Time (<span class="time-utc" style="display:none">UTC</span><span class="time-local">Local</span><i class="icon-exchange time-switch"></i>)</th>
               <th>Txid</th>
               <th>Trade</th>
               <th>Price (<i class="icon-exchange price-invert"></i>)</th>
@@ -273,7 +273,7 @@ RecentTradesPanel.prototype = derive(Panel, {
 
     this._root.find('.panel-content').append(elem);
 
-    this._timeLocal = false;
+    this._timeLocal = true;
     this._priceInverted = false;
     this._initialized = false;
   },
