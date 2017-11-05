@@ -77,6 +77,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "PTOY",
       decimals: 8,
     },
+    "0x0f5d2fb29fb7d3cfee444a200298f468908cc942": {
+      name: "Decentraland MANA",
+      symbol: "MANA",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
