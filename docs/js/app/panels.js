@@ -706,7 +706,9 @@ TokenPairsChartPanel.prototype = derive(Panel, {
     var pairNames = Object.keys(tokenPairCounts);
 
     /* Sort pair names by count */
-    pairNames.sort(function (a, b) { return tokenPairCounts[a] < tokenPairCounts[b]; });
+    var foo = pairNames.sort(function (a, b) {
+      return tokenPairCounts[b] - tokenPairCounts[a];
+    });
 
     var pairCounts = [];
 
