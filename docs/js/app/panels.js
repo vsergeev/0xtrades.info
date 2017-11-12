@@ -534,29 +534,38 @@ TokenVolumeChartPanel.prototype = derive(Panel, {
     this._root.find(".panel-content").append(elem);
 
     var chartConfig = {
-      type: 'pie',
-      options: {responsive: true, tooltips: {callbacks: {label: CHART_DEFAULT_TOOLTIP_CALLBACK}}},
+      type: 'bar',
+      options: {
+        responsive: true,
+        tooltips: {callbacks: {label: CHART_DEFAULT_TOOLTIP_CALLBACK}},
+        legend: {display: false},
+        scales: {yAxes: [{ticks: {callback: this._view.formatPriceUnits.bind(this._view)}}]},
+      },
       data: { datasets: [{ backgroundColor: CHART_DEFAULT_COLORS, tooltips: [] }] }
     };
     this._chart = new Chart(elem.find('canvas')[0].getContext('2d'), chartConfig);
   },
 
   handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
+    /* Token Volumes */
     var tokens = Object.keys(statistics['volume'].tokens);
 
-    /* Sort tokens by address */
-    tokens.sort();
+    /* Filter tokens by existence in registry */
+    tokens = tokens.filter(function (token) { return ZEROEX_TOKEN_INFOS[token] != undefined; });
+
+    /* Sort tokens by fiat volume */
+    tokens.sort(function (a, b) {
+        return statistics['volume'].tokens[a].volumeFiat.lt(statistics['volume'].tokens[b].volumeFiat);
+    });
 
     var tokenNames = [];
     var tokenVolumes = []
     var tokenVolumesFormatted = [];
 
     for (var i = 0; i < tokens.length; i++) {
-      if (ZEROEX_TOKEN_INFOS[tokens[i]] && statistics['volume'].tokens[tokens[i]].volumeFiat.gt(0)) {
-        tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
-        tokenVolumes.push(statistics['volume'].tokens[tokens[i]].volumeFiat.toNumber());
-        tokenVolumesFormatted.push(this._view.formatPrice(statistics['volume'].tokens[tokens[i]].volumeFiat));
-      }
+      tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
+      tokenVolumes.push(statistics['volume'].tokens[tokens[i]].volumeFiat.toNumber());
+      tokenVolumesFormatted.push(this._view.formatPrice(statistics['volume'].tokens[tokens[i]].volumeFiat));
     }
 
     this._chart.data.labels = tokenNames;
