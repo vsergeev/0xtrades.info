@@ -703,12 +703,15 @@ TokenPairsChartPanel.prototype = derive(Panel, {
       }
     }
 
-    var pairNames = [];
+    var pairNames = Object.keys(tokenPairCounts);
+
+    /* Sort pair names by count */
+    pairNames.sort(function (a, b) { return tokenPairCounts[a] < tokenPairCounts[b]; });
+
     var pairCounts = [];
 
-    for (var pair in tokenPairCounts) {
-      pairNames.push(pair);
-      pairCounts.push(tokenPairCounts[pair]);
+    for (var i = 0; i < pairNames.length; i++) {
+      pairCounts.push(tokenPairCounts[pairNames[i]]);
     }
 
     this._chart.data.labels = pairNames;
