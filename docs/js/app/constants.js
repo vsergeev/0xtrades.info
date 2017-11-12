@@ -82,6 +82,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "MANA",
       decimals: 18,
     },
+    "0xea38eaa3c86c8f9b751533ba2e562deb9acded40": {
+      name: "Fuel Token",
+      symbol: "FUEL",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
