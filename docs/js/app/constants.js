@@ -97,6 +97,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "EMB",
       decimals: 0,
     },
+    "0x814964b1bceaf24e26296d031eadf134a2ca4105": {
+      name: "Newbium",
+      symbol: "NEWB",
+      decimals: 0,
+    },
 };
 
 /* Populated by model */
