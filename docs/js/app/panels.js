@@ -393,7 +393,7 @@ RecentTradesPanel.prototype = derive(Panel, {
             <tr><th>Maker Fee</th><td></td></tr>
             <tr><th>Taker Fee</th><td></td></tr>
             <tr><th>Order Hash</th><td></td></tr>
-            <tr><th>Order JSON</th><td><button type="button" class="btn btn-sm btn-info fetch-order">Fetch Order</button></td></tr>
+            <tr><th>Order JSON</th><td></td></tr>
           </tbody>
         </table>
       `);
@@ -427,7 +427,8 @@ RecentTradesPanel.prototype = derive(Panel, {
       /* Order Hash */
       table.find('td').eq(10).text(trade.orderHash);
 
-      table.find('button').click(this.handleFetchOrder.bind(this, table, trade));
+      /* Fetch the order information */
+      this.fetchOrder(table, trade);
 
       var elem = $('<tr></tr>')
                   .append($('<td></td>'))
@@ -440,7 +441,7 @@ RecentTradesPanel.prototype = derive(Panel, {
     }
   },
 
-  handleFetchOrder: function (dom, trade) {
+  fetchOrder: function (dom, trade) {
     var self = this;
     this._view.fetchOrderCallback(trade).then(function (result) {
       /* Render an error */
