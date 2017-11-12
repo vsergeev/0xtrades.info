@@ -220,7 +220,10 @@ View.prototype = {
   },
 
   formatPrice: function (price) {
-    return this._currencyInfo.symbol + price.toFixed(this._currencyInfo.decimal_digits) + " " + this._currencyInfo.code;
+    if (this._currencyInfo)
+      return this._currencyInfo.symbol + price.toFixed(this._currencyInfo.decimal_digits) + " " + this._currencyInfo.code;
+    else
+      return price;
   },
 
   formatHex: function (hex, digits) {
