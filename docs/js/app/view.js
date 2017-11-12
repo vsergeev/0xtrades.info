@@ -171,6 +171,14 @@ View.prototype = {
     return panel;
   },
 
+  panelChange: function (panel) {
+    var root = panel._root;
+
+    this.panelRemove(panel, false);
+
+    this.panelCreate(root, EmptyPanel);
+  },
+
   panelRemove: function (panel, prune) {
     var root = panel._root;
 

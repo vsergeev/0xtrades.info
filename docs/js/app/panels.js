@@ -45,6 +45,7 @@ Panel.prototype = {
         <span class="anchor" id="panel-${this._id}"></span>
         <div class="panel-controls-wrapper">
           <div class="panel-controls">
+            <a class="panel-change" href="#"><i class="icon-pencil"></i></a>
             <a class="panel-header-link" href="#panel-${this._id}"><i class="icon-link"></i></a>
             <a class="panel-close" href="#"><i class="icon-cancel"></i></a>
           </div>
@@ -54,6 +55,13 @@ Panel.prototype = {
       <div class="panel-content">
       </div>
     `);
+
+    /* Associate callback for change button */
+    dom.find(".panel-change")
+      .on('click', {panel: this, view: this._view}, function (e) {
+        e.preventDefault();
+        e.data.view.panelChange(e.data.panel);
+      });
 
     /* Associate callback for close button */
     dom.find(".panel-close")

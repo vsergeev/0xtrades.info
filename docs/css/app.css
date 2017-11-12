@@ -91,6 +91,16 @@ h3 {
   position: absolute;
 }
 
+.panel-change {
+  font-size: 1rem;
+  line-height: 1rem;
+  opacity: 0;
+}
+
+div.panel-header:hover .panel-change {
+  opacity: 1;
+}
+
 .panel-header-link {
   font-size: 1rem;
   line-height: 1rem;
