@@ -392,6 +392,8 @@ RecentTradesPanel.prototype = derive(Panel, {
             <tr><th>Taker Amount</th><td></td></tr>
             <tr><th>Maker Fee</th><td></td></tr>
             <tr><th>Taker Fee</th><td></td></tr>
+            <tr><th>Gas Used</th><td></td></tr>
+            <tr><th>Tx Fee</th><td></td></tr>
             <tr><th>Order Hash</th><td></td></tr>
             <tr><th>Order JSON</th><td></td></tr>
           </tbody>
@@ -425,7 +427,7 @@ RecentTradesPanel.prototype = derive(Panel, {
       /* Taker Fee */
       table.find('td').eq(9).text(trade.takerFee + " ZRX");
       /* Order Hash */
-      table.find('td').eq(10).text(trade.orderHash);
+      table.find('td').eq(12).text(trade.orderHash);
 
       /* Fetch the order information */
       this.fetchOrder(table, trade);
@@ -444,10 +446,19 @@ RecentTradesPanel.prototype = derive(Panel, {
   fetchOrder: function (dom, trade) {
     var self = this;
     this._view.fetchOrderCallback(trade).then(function (result) {
+      if (result.transaction) {
+        /* Render Gas */
+        var gasUsed = result.transaction.gas.toString();
+        var gasPrice = web3.fromWei(result.transaction.gasPrice.toString(), 'gwei').toString();
+        var gasEth = web3.fromWei(result.transaction.gasPrice.mul(result.transaction.gas), 'ether').toString();
+        dom.find('td').eq(10).text(gasUsed);
+        dom.find('td').eq(11).text(gasEth + " ETH");
+      }
+
       /* Render an error */
       if (result.error) {
         var elem = $('<b></b>').addClass('text-danger').text("Error: " + result.error);
-        dom.find('td').eq(11).html(elem);
+        dom.find('td').eq(13).html(elem);
         return;
       }
 
@@ -490,7 +501,7 @@ RecentTradesPanel.prototype = derive(Panel, {
                               .toggleClass('disabled', result.takerAmountRemaining.eq(0) || result.isExpired)
                               .text('Fill Order')));
 
-      dom.find('td').eq(11).html(elem);
+      dom.find('td').eq(13).html(elem);
     });
   },
 
