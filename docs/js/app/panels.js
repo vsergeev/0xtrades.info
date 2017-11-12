@@ -632,24 +632,31 @@ TokenOccurrenceChartPanel.prototype = derive(Panel, {
   handleStatisticsUpdatedEvent: function (statistics, priceVolumeHistory) {
     var tokens = Object.keys(statistics['volume'].tokens);
 
-    /* Sort tokens by address */
-    tokens.sort();
+    /* Count unknown tokens */
+    var unknownCount = tokens.reduce(function (acc, token) {
+      return acc + (ZEROEX_TOKEN_INFOS[token] == undefined && statistics['volume'].tokens[token].count);
+    }, 0);
+
+    /* Filter unknown tokens */
+    tokens = tokens.filter(function (token) { return ZEROEX_TOKEN_INFOS[token] != undefined; });
+
+    /* Sort tokens by count */
+    tokens.sort(function (a, b) {
+      return statistics['volume'].tokens[b].count - statistics['volume'].tokens[a].count;
+    });
 
     var tokenNames = [];
     var tokenCounts = [];
-    var unknownCount = 0;
 
     for (var i = 0; i < tokens.length; i++) {
-      if (ZEROEX_TOKEN_INFOS[tokens[i]]) {
-        tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
-        tokenCounts.push(statistics['volume'].tokens[tokens[i]].count);
-      } else {
-        unknownCount += 1;
-      }
+      tokenNames.push(ZEROEX_TOKEN_INFOS[tokens[i]].symbol);
+      tokenCounts.push(statistics['volume'].tokens[tokens[i]].count);
     }
 
-    tokenNames.push('Unknown');
-    tokenCounts.push(unknownCount);
+    if (unknownCount > 0) {
+      tokenNames.push('Unknown');
+      tokenCounts.push(unknownCount);
+    }
 
     this._chart.data.labels = tokenNames;
     this._chart.data.datasets[0].data = tokenCounts;
