@@ -713,7 +713,13 @@ TokenPairsChartPanel.prototype = derive(Panel, {
   handleNewTradeEvent: function (index, trade, tradeHistory) {
     var tokenPairCounts = {};
 
+    var currentTimestamp = Math.round((new Date()).getTime() / 1000);
+    var cutoffTimestamp = currentTimestamp - STATISTICS_TIME_WINDOW;
+
     for (var i = 0; i < tradeHistory.length; i++) {
+      if (tradeHistory[i].timestamp < cutoffTimestamp)
+        break;
+
       if (tradeHistory[i].makerNormalized && tradeHistory[i].takerNormalized) {
         var symbols = [ZEROEX_TOKEN_INFOS[tradeHistory[i].makerToken].symbol,
                        ZEROEX_TOKEN_INFOS[tradeHistory[i].takerToken].symbol];
