@@ -50,7 +50,8 @@ h3 {
 
 .description {
   font-weight: 300;
-  font-size: 1.2rem;
+  font-size: 1.0rem;
+  margin-bottom: 0.5rem;
 }
 
 /******************************************************************************/
