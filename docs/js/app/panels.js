@@ -551,7 +551,10 @@ TokenVolumeChartPanel.prototype = derive(Panel, {
         responsive: true,
         tooltips: {callbacks: {label: CHART_DEFAULT_TOOLTIP_CALLBACK}},
         legend: {display: false},
-        scales: {yAxes: [{ticks: {callback: this._view.formatPriceUnits.bind(this._view)}}]},
+        scales: {
+          yAxes: [{ticks: {callback: this._view.formatPriceUnits.bind(this._view)}}],
+          xAxes: [{ticks: {autoSkip: false}}],
+        },
       },
       data: { datasets: [{ backgroundColor: CHART_DEFAULT_COLORS, tooltips: [] }] }
     };
