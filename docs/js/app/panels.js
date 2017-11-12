@@ -206,7 +206,7 @@ VolumeStatisticsPanel.prototype = derive(Panel, {
 
     /* Sort tokens by fiat volume */
     tokens.sort(function (a, b) {
-        return statistics['volume'].tokens[a].volumeFiat.lt(statistics['volume'].tokens[b].volumeFiat);
+        return statistics['volume'].tokens[a].volumeFiat.lt(statistics['volume'].tokens[b].volumeFiat) - 0.5;
     });
 
     for (var i = 0; i < tokens.length; i++) {
