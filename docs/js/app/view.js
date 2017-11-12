@@ -226,6 +226,13 @@ View.prototype = {
       return price;
   },
 
+  formatPriceUnits: function (price) {
+    if (this._currencyInfo)
+      return this._currencyInfo.symbol + price.toFixed(this._currencyInfo.decimal_digits);
+    else
+      return price;
+  },
+
   formatHex: function (hex, digits) {
     digits = digits || 6;
 
