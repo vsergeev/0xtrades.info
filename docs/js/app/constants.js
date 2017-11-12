@@ -102,6 +102,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "NEWB",
       decimals: 0,
     },
+    "0x2fd41f516fac94ed08e156f489f56ca3a80b04d0": {
+      name: "eBTC",
+      symbol: "EBTC",
+      decimals: 8,
+    },
 };
 
 /* Populated by model */
