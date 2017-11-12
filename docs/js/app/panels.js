@@ -807,7 +807,9 @@ RelayFeeChartPanel.prototype = derive(Panel, {
         responsive: true,
         tooltips: {callbacks: {label: CHART_DEFAULT_TOOLTIP_CALLBACK}},
         legend: {display: false},
-        scales: {yAxes: [{ticks: {beginAtZero: true}}]},
+        scales: {
+          yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {display: true, labelString: 'Fees (ZRX)'}}]
+        },
       },
       data: { datasets: [{ backgroundColor: CHART_DEFAULT_COLORS, tooltips: [] }] }
     };
