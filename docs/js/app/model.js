@@ -474,21 +474,21 @@ Model.prototype = {
 
   fetchOrder: function (trade) {
     var self = this;
-    return this.getTransaction(trade.txid).then(function (result) {
+    return this.getTransaction(trade.txid).then(function (transaction) {
       /* FIXME this all should really use an abi decoder */
 
-      var methodId = result.input.substring(0, 10);
+      var methodId = transaction.input.substring(0, 10);
 
       /* Only support fillOrder() method for now */
       if (methodId != "0xbc61394a")
-        return {error: "Unsupported fill method."};
-      else if (result.length < 1034)
-        return {error: "Unsupported fill method."};
+        return {error: "Unsupported fill method.", transaction: transaction};
+      else if (transaction.length < 1034)
+        return {error: "Unsupported fill method.", transaction: transaction};
 
       /* Extract 15 params from the input data */
       var params = [];
       for (var i = 10; i < 1034; i+= 64)
-        params.push(result.input.substring(i, i+64));
+        params.push(transaction.input.substring(i, i+64));
 
       /* Form 0x.js order object */
       var order = {};
@@ -556,6 +556,7 @@ Model.prototype = {
           isExpired: isExpired,
           takerAmountRemaining: takerAmountRemaining,
           takerAmountRemainingNormalized: takerAmountRemainingNormalized,
+          transaction: transaction,
           error: null
         };
       });
