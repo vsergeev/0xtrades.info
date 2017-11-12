@@ -87,6 +87,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "FUEL",
       decimals: 18,
     },
+    "0xf970b8e36e23f7fc3fd752eea86f8be8d83375a6": {
+      name: "Ripio Credit Network Token",
+      symbol: "RCN",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
