@@ -92,6 +92,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "RCN",
       decimals: 18,
     },
+    "0x386467f1f3ddbe832448650418311a479eecfc57": {
+      name: "Embers",
+      symbol: "EMB",
+      decimals: 0,
+    },
 };
 
 /* Populated by model */
