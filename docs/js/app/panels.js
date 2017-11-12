@@ -623,7 +623,14 @@ TokenOccurrenceChartPanel.prototype = derive(Panel, {
 
     var chartConfig = {
       type: 'bar',
-      options: {responsive: true, tooltips: {callbacks: {label: CHART_DEFAULT_TOOLTIP_CALLBACK}}, legend: {display: false}},
+      options: {
+        responsive: true,
+        tooltips: {callbacks: {label: CHART_DEFAULT_TOOLTIP_CALLBACK}},
+        legend: {display: false},
+        scales: {
+          yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {display: true, labelString: 'Trades'}}]
+        },
+      },
       data: { datasets: [{ backgroundColor: CHART_DEFAULT_COLORS, tooltips: [] }] }
     };
     this._chart = new Chart(elem.find('canvas')[0].getContext('2d'), chartConfig);
