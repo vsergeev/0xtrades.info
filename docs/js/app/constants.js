@@ -107,6 +107,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "EBTC",
       decimals: 8,
     },
+    "0x99ea4db9ee77acd40b119bd1dc4e33e1c070b80d": {
+      name: "Quantstamp Token",
+      symbol: "QSP",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
