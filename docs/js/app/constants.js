@@ -122,6 +122,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "UKG",
       decimals: 18,
     },
+    "0xea1f346faf023f974eb5adaf088bbcdf02d761f4": {
+      name: "Blocktix Token",
+      symbol: "TIX",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
