@@ -112,6 +112,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "QSP",
       decimals: 18,
     },
+    "0x56ba2ee7890461f463f7be02aac3099f6d5811a8": {
+      name: "BlockCAT Token",
+      symbol: "CAT",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
