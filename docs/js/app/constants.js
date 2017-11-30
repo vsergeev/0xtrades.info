@@ -117,6 +117,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "CAT",
       decimals: 18,
     },
+    "0x24692791bc444c5cd0b81e3cbcaba4b04acd1f3b": {
+      name: "UnikoinGold",
+      symbol: "UKG",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
