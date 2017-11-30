@@ -30,7 +30,7 @@
 var Model = function (web3, fiatCurrency) {
   /* web3 interface */
   this._web3 = web3;
-  this._zeroEx = new ZeroEx.ZeroEx(web3.currentProvider);
+  this._zeroEx = null;
 
   /* Network status */
   this._networkId = null;
@@ -72,7 +72,11 @@ Model.prototype = {
 
         self.connectedCallback(self._networkId, self._fiatCurrency, ERRORS.GET_NETWORK_ID)
       } else {
-        self._networkId = result;
+        self._networkId = parseInt(result);
+
+        self._zeroEx = new ZeroEx.ZeroEx(self._web3.currentProvider, {networkId: self._networkId});
+
+        ZEROEX_EXCHANGE_ADDRESS = self._zeroEx.exchange.getContractAddress();
 
         Logger.log('[Model] Network ID: ' + self._networkId);
 
@@ -92,15 +96,10 @@ Model.prototype = {
 
               Logger.log('[Model] Block height: ' + self._blockHeight);
 
-              /* Fetch exchange address */
-              self._zeroEx.exchange.getContractAddressAsync().then(function (address) {
-                ZEROEX_EXCHANGE_ADDRESS = address;
+              self.connectedCallback(self._networkId, self._fiatCurrency, null);
 
-                self.connectedCallback(self._networkId, self._fiatCurrency, null);
-
-                /* Fetch token registry */
-                return self._zeroEx.tokenRegistry.getTokensAsync();
-              }).then(function (tokens) {
+              /* Fetch token registry */
+              self._zeroEx.tokenRegistry.getTokensAsync().then(function (tokens) {
                 for (var i = 0; i < tokens.length; i++) {
                   ZEROEX_TOKEN_INFOS[tokens[i].address] = {
                     decimals: tokens[i].decimals,
@@ -116,7 +115,7 @@ Model.prototype = {
                 self.updatePrices();
 
                 /* Subscribe to new fill logs */
-                self._zeroEx.exchange.subscribeAsync("LogFill", {}, self.handleLogFillEvent.bind(self, null));
+                self._zeroEx.exchange.subscribe("LogFill", {}, self.handleLogFillEvent.bind(self, null));
 
                 /* Fetch past fill logs */
                 self.fetchPastTradesDuration(STATISTICS_TIME_WINDOW).then(function () {
