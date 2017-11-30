@@ -792,6 +792,7 @@ FeeFeelessChartPanel.prototype = derive(Panel, {
         legend: {display: false},
         scales: {
           yAxes: [{ticks: {beginAtZero: true, callback: function (v) { return ((v % 1) == 0) ? v : null; }}, scaleLabel: {display: true, labelString: 'Trades'}}],
+          xAxes: [{barPercentage: 0.35}],
         },
       },
       data: { datasets: [{ backgroundColor: CHART_DEFAULT_COLORS, tooltips: [] }] }
