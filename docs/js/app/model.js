@@ -115,7 +115,7 @@ Model.prototype = {
                 self.updatePrices();
 
                 /* Subscribe to new fill logs */
-                self._zeroEx.exchange.subscribe("LogFill", {}, self.handleLogFillEvent.bind(self, null));
+                self._zeroEx.exchange.subscribe("LogFill", {}, self.handleLogFillEvent.bind(self));
 
                 /* Fetch past fill logs */
                 self.fetchPastTradesDuration(STATISTICS_TIME_WINDOW).then(function () {
