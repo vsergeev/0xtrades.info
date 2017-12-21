@@ -261,7 +261,7 @@ View.prototype = {
 
   formatRelay: function (address, digits) {
     if (ZEROEX_RELAY_ADDRESSES[this._networkId][address]) {
-      return ZEROEX_RELAY_ADDRESSES[this._networkId][address];
+      return ZEROEX_RELAY_ADDRESSES[this._networkId][address].name;
     } else {
       return this.formatHex(address, digits);
     }
