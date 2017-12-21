@@ -236,7 +236,7 @@ View.prototype = {
 
   formatPrice: function (price) {
     if (this._currencyInfo)
-      return this._currencyInfo.symbol + price.toFixed(this._currencyInfo.decimal_digits) + " " + this._currencyInfo.code;
+      return this._currencyInfo.symbol + Number(price.toFixed(this._currencyInfo.decimal_digits)).toLocaleString() + " " + this._currencyInfo.code;
     else
       return price;
   },
