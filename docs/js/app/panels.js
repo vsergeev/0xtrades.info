@@ -419,7 +419,13 @@ RecentTradesPanel.prototype = derive(Panel, {
       /* Taker Address */
       table.find('td').eq(4).html(this._view.formatAddressLink(trade.takerAddress, trade.takerAddress));
       /* Relay Address */
-      table.find('td').eq(5).html(this._view.formatRelayLink(trade.relayAddress, 64));
+      table.find('td').eq(5).html(this._view.formatAddressLink(trade.relayAddress, trade.relayAddress));
+      if (this._view.isRelayAddress(trade.relayAddress)) {
+        table.find('td').eq(5).append($("<span></span>")
+                                        .append(" (")
+                                        .append(this._view.formatRelayLink(trade.relayAddress))
+                                        .append(")"));
+      }
       /* Maker Volume/Token */
       table.find('td').eq(6).html($("<span></span>")
                                     .append($(trade.makerNormalized ? "<span></span>" : "<i></i>")
