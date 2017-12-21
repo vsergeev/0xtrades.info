@@ -286,3 +286,24 @@ table.trade-more-info {
 #status-bar a, #status-bar b {
   color: #62AEFC;
 }
+
+/******************************************************************************/
+
+/* Loading modal */
+
+#loading-modal .modal-dialog {
+  margin-top: 15vh;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#loading-modal h3 {
+  margin: 0;
+}
+
+#loading-modal .progress-bar {
+  width: 100%;
+  height: 1.2rem;
+  line-height: 1.2rem;
+  font-weight: bold;
+}

@@ -84,6 +84,8 @@ View.prototype = {
       $('#status-bar-network')
         .append($('<b></b>')
           .html(this.formatAddressLink(ZEROEX_EXCHANGE_ADDRESS, networkName, true)));
+
+      $('#loading-modal').modal('show');
     } else if (error == ERRORS.UNSUPPORTED_NETWORK) {
       $('#status-bar-network')
         .append($('<b></b>')
@@ -102,6 +104,13 @@ View.prototype = {
 
     /* Update selected currency text */
     $('#currency-dropdown-text').text(this._currencyInfo.symbol + " " + fiatCurrency);
+  },
+
+  handleFetchingEvent: function (count, done) {
+    if (!done)
+      $('#loading-modal .progress-bar').text(count);
+    else
+      $('#loading-modal').modal('hide');
   },
 
   handleNewTradeEvent: function (index, trade, tradeHistory) {

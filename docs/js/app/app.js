@@ -52,6 +52,7 @@ Controller.prototype = {
     /* Bind model -> view */
     this.model.connectedCallback = this.view.handleConnectedEvent.bind(this.view);
     this.model.newTradeCallback = this.view.handleNewTradeEvent.bind(this.view);
+    this.model.fetchingCallback = this.view.handleFetchingEvent.bind(this.view);
     this.model.statisticsUpdatedCallback = this.view.handleStatisticsUpdatedEvent.bind(this.view);
 
     /* Bind view -> model */

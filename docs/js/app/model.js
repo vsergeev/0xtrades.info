@@ -52,6 +52,7 @@ var Model = function (web3, fiatCurrency) {
 
   /* Callbacks */
   this.connectedCallback = null;
+  this.fetchingCallback = null;
   this.newTradeCallback = null;
   this.statisticsUpdatedCallback = null;
 };
@@ -120,6 +121,8 @@ Model.prototype = {
                 /* Fetch past fill logs */
                 self.fetchPastTradesDuration(STATISTICS_TIME_WINDOW).then(function () {
                   self._initialFetchDone = true;
+
+                  self.fetchingCallback(self._trades.length, true);
 
                   /* Now, update the statistics */
                   self.updateStatistics();
@@ -267,6 +270,11 @@ Model.prototype = {
 
           /* Call view callback */
           self.newTradeCallback(index, trade, self._trades);
+
+          /* Call fetching callback */
+          if (!self._initialFetchDone) {
+            self.fetchingCallback(self._trades.length, false);
+          }
 
           /* Update statistics */
           self.updateStatistics();
