@@ -298,6 +298,10 @@ View.prototype = {
     }
   },
 
+  isRelayAddress: function (address) {
+    return ZEROEX_RELAY_ADDRESSES[this._networkId][address] != undefined;
+  },
+
   formatRelayLink: function (address, digits) {
     if (ZEROEX_RELAY_ADDRESSES[this._networkId][address]) {
       return this.formatTokenAddressLink(ZEROEX_TOKEN_ADDRESS, address, ZEROEX_RELAY_ADDRESSES[this._networkId][address]);
