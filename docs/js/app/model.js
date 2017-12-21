@@ -102,14 +102,16 @@ Model.prototype = {
               /* Fetch token registry */
               self._zeroEx.tokenRegistry.getTokensAsync().then(function (tokens) {
                 for (var i = 0; i < tokens.length; i++) {
-                  ZEROEX_TOKEN_INFOS[tokens[i].address] = {
-                    decimals: tokens[i].decimals,
-                    name: tokens[i].name,
-                    symbol: tokens[i].symbol
-                  };
-
                   if (tokens[i].symbol == "ZRX")
                     ZEROEX_TOKEN_ADDRESS = tokens[i].address;
+
+                  if (!ZEROEX_TOKEN_INFOS[tokens[i].address]) {
+                    ZEROEX_TOKEN_INFOS[tokens[i].address] = {
+                      decimals: tokens[i].decimals,
+                      name: tokens[i].name,
+                      symbol: tokens[i].symbol
+                    };
+                  }
                 }
               }).then(function () {
                 /* Update prices */
