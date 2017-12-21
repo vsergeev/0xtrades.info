@@ -304,7 +304,12 @@ View.prototype = {
 
   formatRelayLink: function (address, digits) {
     if (ZEROEX_RELAY_ADDRESSES[this._networkId][address]) {
-      return this.formatTokenAddressLink(ZEROEX_TOKEN_ADDRESS, address, ZEROEX_RELAY_ADDRESSES[this._networkId][address]);
+      var elem = $('<a></a>')
+                 .attr('href', ZEROEX_RELAY_ADDRESSES[this._networkId][address].website)
+                 .attr('target', '_blank')
+                 .text(ZEROEX_RELAY_ADDRESSES[this._networkId][address].name);
+
+      return elem;
     } else if (web3.toDecimal(address) == 0) {
       return $("<span></span>").text("None");
     } else {
