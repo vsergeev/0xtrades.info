@@ -142,6 +142,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "DAI",
       decimals: 18,
     },
+    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": {
+      name: "Wrapped Ether",
+      symbol: "WETH",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
