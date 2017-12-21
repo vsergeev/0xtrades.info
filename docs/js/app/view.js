@@ -235,10 +235,12 @@ View.prototype = {
   },
 
   formatPrice: function (price) {
-    if (this._currencyInfo)
-      return this._currencyInfo.symbol + Number(price.toFixed(this._currencyInfo.decimal_digits)).toLocaleString() + " " + this._currencyInfo.code;
-    else
+    if (this._currencyInfo) {
+      price = (price > 1) ? Number(price.toFixed(this._currencyInfo.decimal_digits)).toLocaleString() : price.toFixed(this._currencyInfo.decimal_digits);
+      return this._currencyInfo.symbol + price + " " + this._currencyInfo.code;
+    } else {
       return price;
+    }
   },
 
   formatPriceUnits: function (price) {
