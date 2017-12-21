@@ -40,12 +40,24 @@ var ZEROEX_GENESIS_BLOCK = {
 
 var ZEROEX_RELAY_ADDRESSES = {
   1: {
-    "0xa258b39954cef5cb142fd567a46cddb31a670124": "Radar Relay",
-    "0xeb71bad396acaa128aeadbc7dbd59ca32263de01": "Kin Alpha",
-    "0xc22d5b2951db72b44cfb8089bb8cd374a3c354ea": "OpenRelay",
+    "0xa258b39954cef5cb142fd567a46cddb31a670124": {
+      name: "Radar Relay",
+      website: "https://radarrelay.com",
+    },
+    "0xeb71bad396acaa128aeadbc7dbd59ca32263de01": {
+      name: "Kin Alpha",
+      website: "https://kinalpha.com",
+    },
+    "0xc22d5b2951db72b44cfb8089bb8cd374a3c354ea": {
+      name: "OpenRelay",
+      website: "https://openrelay.xyz",
+    },
   },
   42: {
-    "0xa258b39954cef5cb142fd567a46cddb31a670124": "Radar Relay",
+    "0xa258b39954cef5cb142fd567a46cddb31a670124": {
+      name: "Radar Relay",
+      website: "https://radarrelay.com",
+    },
   },
 };
 
