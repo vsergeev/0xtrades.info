@@ -285,7 +285,7 @@ View.prototype = {
 
   formatTokenWebsiteLink: function (address, digits) {
     if (ZEROEX_TOKEN_INFOS[address] && ZEROEX_TOKEN_INFOS[address].website) {
-       var elem = $('<a></a>')
+      var elem = $('<a></a>')
                  .attr('href', ZEROEX_TOKEN_INFOS[address].website)
                  .attr('target', '_blank')
                  .text(ZEROEX_TOKEN_INFOS[address].symbol);
