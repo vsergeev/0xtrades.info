@@ -224,7 +224,7 @@ VolumeStatisticsPanel.prototype = derive(Panel, {
 
       var elem = $('<tr></tr>')
                    .append($('<th></th>')
-                            .append(this._view.formatTokenLink(tokens[i])))
+                            .append(this._view.formatTokenWebsiteLink(tokens[i])))
                    .append($('<td></td>')
                              .text(volume));
       this._root.find("tbody").first().append(elem);
