@@ -127,6 +127,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "TIX",
       decimals: 18,
     },
+    "0xd2d6158683aee4cc838067727209a0aaf4359de3": {
+      name: "Bounty0x Token",
+      symbol: "BNTY",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
