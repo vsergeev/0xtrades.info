@@ -137,6 +137,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "CRED",
       decimals: 18,
     },
+    "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359": {
+      name: "Dai Stablecoin v1.0",
+      symbol: "DAI",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
