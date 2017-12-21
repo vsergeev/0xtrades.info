@@ -132,6 +132,11 @@ var ZEROEX_TOKEN_INFOS = {
       symbol: "BNTY",
       decimals: 18,
     },
+    "0x672a1ad4f667fb18a333af13667aa0af1f5b5bdd": {
+      name: "Verify Token",
+      symbol: "CRED",
+      decimals: 18,
+    },
 };
 
 /* Populated by model */
