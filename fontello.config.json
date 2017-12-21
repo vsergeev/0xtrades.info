@@ -77,6 +77,12 @@
       "css": "pencil",
       "code": 59400,
       "src": "entypo"
+    },
+    {
+      "uid": "f0c301ac841dafc38d8eb1b933fc73e5",
+      "css": "spin2",
+      "code": 59441,
+      "src": "fontelico"
     }
   ]
 }

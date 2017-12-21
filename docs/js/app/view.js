@@ -126,8 +126,6 @@ View.prototype = {
     /* Update ZRX price in status bar */
     if (statistics['fees'].zrxPrice)
       $('#status-bar-zrx-price-text').text(this.formatPrice(statistics['fees'].zrxPrice));
-    else
-      $('#status-bar-zrx-price-text').text("N/A");
 
     this._lastStatisticsUpdatedEvent = arguments;
   },
