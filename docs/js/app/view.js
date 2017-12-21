@@ -283,6 +283,21 @@ View.prototype = {
     }
   },
 
+  formatTokenWebsiteLink: function (address, digits) {
+    if (ZEROEX_TOKEN_INFOS[address] && ZEROEX_TOKEN_INFOS[address].website) {
+       var elem = $('<a></a>')
+                 .attr('href', ZEROEX_TOKEN_INFOS[address].website)
+                 .attr('target', '_blank')
+                 .text(ZEROEX_TOKEN_INFOS[address].symbol);
+
+      elem = elem.append($('<i></i>').addClass('icon-globe'));
+
+      return elem;
+    } else {
+      return this.formatTokenLink(address, digits);
+    }
+  },
+
   formatRelayLink: function (address, digits) {
     if (ZEROEX_RELAY_ADDRESSES[this._networkId][address]) {
       return this.formatTokenAddressLink(ZEROEX_TOKEN_ADDRESS, address, ZEROEX_RELAY_ADDRESSES[this._networkId][address]);
