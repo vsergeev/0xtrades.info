@@ -471,6 +471,12 @@ var ZEROEX_TOKEN_INFOS = {
       decimals: 3,
       website: "https://matchpool.co/guppy",
     },
+    "0xc997d07b0bc607b6d1bcb6fb9d4a5579c466c3e5": {
+      name: "Flip",
+      symbol: "FLIP",
+      decimals: 0,
+      website: "http://www.etherflip.co",
+    },
 };
 
 /* Populated by model */
