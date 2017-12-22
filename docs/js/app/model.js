@@ -386,16 +386,26 @@ Model.prototype = {
   updatePrices: function () {
     Logger.log('[Model] Fetching token prices');
 
-    /* Collect all symbols from token registry */
-    var symbols = ['ETH'];
-    for (var key in ZEROEX_TOKEN_INFOS)
-      symbols.push(ZEROEX_TOKEN_INFOS[key].symbol);
+    /* Split symbols from token registry into two queries */
+    var numSymbols = Object.keys(ZEROEX_TOKEN_INFOS).length;
+    var symbols1 = ['ETH'];
+    var symbols2 = [];
+    var count = 0;
+    for (var key in ZEROEX_TOKEN_INFOS) {
+      if (count < numSymbols/2)
+        symbols1.push(ZEROEX_TOKEN_INFOS[key].symbol);
+      else
+        symbols2.push(ZEROEX_TOKEN_INFOS[key].symbol);
 
-    var endpoint = PRICE_API_URL(symbols, this._fiatCurrency);
+      count += 1;
+    }
+
+    var endpoint1 = PRICE_API_URL(symbols1, this._fiatCurrency);
+    var endpoint2 = PRICE_API_URL(symbols2, this._fiatCurrency);
 
     var self = this;
-    return $.getJSON(endpoint).then(function (prices) {
-      Logger.log('[Model] Got token prices');
+    return $.getJSON(endpoint1).then(function (prices) {
+      Logger.log('[Model] Got token prices from first query');
       Logger.log(prices);
 
       /* Extract prices */
@@ -403,7 +413,20 @@ Model.prototype = {
         self._tokenPrices[token] = prices[token][self._fiatCurrency];
 
       /* Map WETH to ETH */
-      self._tokenPrices['WETH'] = self._tokenPrices['ETH'];
+      if (self._tokenPrices['ETH'])
+        self._tokenPrices['WETH'] = self._tokenPrices['ETH'];
+
+      /* Update statistics */
+      self.updateStatistics();
+
+      return $.getJSON(endpoint2);
+    }).then(function (prices) {
+      Logger.log('[Model] Got token prices from second query');
+      Logger.log(prices);
+
+      /* Extract prices */
+      for (var token in prices)
+        self._tokenPrices[token] = prices[token][self._fiatCurrency];
 
       /* Update statistics */
       self.updateStatistics();
