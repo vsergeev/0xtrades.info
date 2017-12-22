@@ -45,8 +45,8 @@ var ZEROEX_RELAY_ADDRESSES = {
       website: "https://radarrelay.com",
     },
     "0xeb71bad396acaa128aeadbc7dbd59ca32263de01": {
-      name: "Kin Alpha",
-      website: "https://kinalpha.com",
+      name: "IDT Exchange",
+      website: "https://www.idtexchange.com",
     },
     "0xc22d5b2951db72b44cfb8089bb8cd374a3c354ea": {
       name: "OpenRelay",
