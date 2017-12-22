@@ -445,7 +445,7 @@ Model.prototype = {
 
   normalizeQuantity: function (token, quantity) {
     if (ZEROEX_TOKEN_INFOS[token])
-      return [quantity.div(10**ZEROEX_TOKEN_INFOS[token].decimals), true];
+      return [quantity.div(Math.pow(10, ZEROEX_TOKEN_INFOS[token].decimals)), true];
     else
       return [quantity, false];
   },
