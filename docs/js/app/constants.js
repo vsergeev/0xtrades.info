@@ -465,6 +465,12 @@ var ZEROEX_TOKEN_INFOS = {
       decimals: 18,
       website: "https://weth.io",
     },
+    "0xf7b098298f7c69fc14610bf71d5e02c60792894c": {
+      name: "Guppy",
+      symbol: "GUP",
+      decimals: 3,
+      website: "https://matchpool.co/guppy",
+    },
 };
 
 /* Populated by model */
