@@ -477,6 +477,12 @@ var ZEROEX_TOKEN_INFOS = {
       decimals: 0,
       website: "http://www.etherflip.co",
     },
+    "0x255aa6df07540cb5d3d297f0d0d4d84cb52bc8e6": {
+      name: "Raiden Token",
+      symbol: "RDN",
+      decimals: 18,
+      website: "https://raiden.network",
+    },
 };
 
 /* Populated by model */
