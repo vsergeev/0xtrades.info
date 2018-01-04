@@ -483,6 +483,12 @@ var ZEROEX_TOKEN_INFOS = {
       decimals: 18,
       website: "https://raiden.network",
     },
+    "0x42d6622dece394b54999fbd73d108123806f6a18": {
+      name: "SpankChain",
+      symbol: "SPANK",
+      decimals: 18,
+      website: "https://spankchain.com",
+    },
 };
 
 /* Populated by model */
