@@ -11,18 +11,43 @@ This app takes the following URL search parameters as debug options:
 * `debug`: Enable debug logging
 * `provider`: Select web3 provider, choice of `current`, `localhost`, `infura`
 
+## Building
+
+Install dependencies:
+
+```
+$ npm install
+```
+
+Bundle the JS application:
+
+```
+$ webpack
+```
+
+Serve the client locally:
+
+```
+$ browser-sync start -s docs -f docs
+```
+
 ## File Structure
 
+* [`client/`](client) - Application
+    * [`constants.ts`](client/constants.ts) - Constants
+    * [`structs.ts`](client/structs.ts) - Structures
+    * [`model.ts`](client/model.ts) - Model
+    * [`view.ts`](client/view.ts) - View
+    * [`controller.ts`](client/controller.ts) - Controller
+    * [`panels.ts`](client/panels.ts) - View Panels
+    * [`logger.ts`](client/logger.ts) - Logger
+    * [`app.ts`](client/app.ts) - Top-level and Entry Point
+    * [`web3-provider-engine.d.ts`](client/web3-provider-engine.d.ts) - web3-provider-engine type definitions
 * [`docs/`](docs/) - Website
     * [`css/`](docs/css)
         * [`app.css`](docs/css/app.css) - Website stylesheet
     * [`js/`](docs/js)
-        * [`app/`](docs/js/app) - Application
-            * [`constants.js`](docs/js/app/constants.js) - Constants
-            * [`model.js`](docs/js/app/model.js) - Model
-            * [`view.js`](docs/js/app/view.js) - View
-            * [`panels.js`](docs/js/app/panels.js) - View Panels
-            * [`app.js`](docs/js/app/app.js) - Controller and Top-level
+        * [`bundle.js`](docs/js/bundle.js) - Bundled JS application
     * [`index.html`](docs/index.html) - Website layout
 * [`LICENSE`](LICENSE) - MIT License
 * [`README.md`](README.md) - This README
@@ -30,4 +55,3 @@ This app takes the following URL search parameters as debug options:
 ## LICENSE
 
 0xtrades.info is MIT licensed. See the included [LICENSE](LICENSE) file.
-

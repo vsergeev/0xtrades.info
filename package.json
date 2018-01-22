@@ -1,0 +1,48 @@
+{
+  "name": "0xtrades.info",
+  "version": "1.0.0",
+  "description": "http://0xtrades.info",
+  "main": "webpack.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "0x.js": "^0.30.0",
+    "@0xproject/types": "^0.1.4",
+    "@0xproject/utils": "^0.2.0",
+    "@types/bootstrap": "^3.3.36",
+    "@types/chart.js": "^2.7.3",
+    "@types/node": "^9.3.0",
+    "awesome-typescript-loader": "^3.4.1",
+    "bootstrap": "^4.0.0",
+    "chart.js": "^2.7.1",
+    "jquery": "^3.3.1",
+    "moment": "^2.20.1",
+    "popper.js": "^1.13.0",
+    "typescript": "^2.6.2",
+    "uglifyjs-webpack-plugin": "^1.1.6",
+    "web3": "^0.20.4",
+    "web3-provider-engine": "^13.5.6",
+    "web3-typescript-typings": "^0.9.4",
+    "webpack": "^3.10.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vsergeev/0xtrades.info.git"
+  },
+  "keywords": [
+    "0x",
+    "zrx",
+    "trades"
+  ],
+  "author": "Vanya A. Sergeev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vsergeev/0xtrades.info/issues"
+  },
+  "homepage": "https://github.com/vsergeev/0xtrades.info#readme"
+}
