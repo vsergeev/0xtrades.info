@@ -44,8 +44,8 @@ export class Controller implements Model.ModelEvents, View.ViewEvents {
     }
 
     public async init() {
-		await this._view.init();
-		await this._model.init();
+        await this._view.init();
+        await this._model.init();
     }
 
     /* Model Events */
@@ -68,11 +68,11 @@ export class Controller implements Model.ModelEvents, View.ViewEvents {
 
     /* View Events */
 
-	public onFetchMore(count: number): void {
+    public onFetchMore(count: number): void {
         this._model.fetchPastTrades(count);
-	}
+    }
 
-	public async onFetchOrder(trade: Trade): Promise<OrderInfo> {
+    public async onFetchOrder(trade: Trade): Promise<OrderInfo> {
         return await this._model.fetchOrder(trade);
-	}
+    }
 }
