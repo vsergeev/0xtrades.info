@@ -102,7 +102,7 @@ export class Model {
         this._priceVolumeHistory = new PriceVolumeHistory();
     }
 
-	public async init() {
+    public async init() {
         /* Fetch the network id */
         try {
             this._networkId = await this._web3Wrapper.getNetworkIdAsync();
@@ -181,7 +181,7 @@ export class Model {
 
         /* Update statistics */
         this._updateStatistics();
-	}
+    }
 
     public bindCallbacks(callbacks: ModelEvents) {
         this._callbacks = callbacks;
