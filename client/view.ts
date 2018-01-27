@@ -39,8 +39,8 @@ import {Trade, Statistics, PortalOrder, OrderInfo} from "./structs";
 /******************************************************************************/
 
 export interface ViewEvents {
-	onFetchMore(count: number): void;
-	onFetchOrder(trade: Trade): Promise<OrderInfo>;
+    onFetchMore(count: number): void;
+    onFetchOrder(trade: Trade): Promise<OrderInfo>;
 }
 
 export class View {
@@ -48,8 +48,8 @@ export class View {
     private _web3: Web3;
 
     /* Network status / Configuration */
-	private _networkId: number;
-	private _fiatCurrencyInfo: Constants.CurrencyInfo;
+    private _networkId: number;
+    private _fiatCurrencyInfo: Constants.CurrencyInfo;
 
     /* Callbacks */
     private _callbacks: ViewEvents;
@@ -68,7 +68,7 @@ export class View {
         this._panels = [];
     }
 
-	public async init() {
+    public async init() {
         /* Absorb current URL parameters as a template */
         let searchParams = new URLSearchParams(window.location.search);
 
@@ -98,7 +98,7 @@ export class View {
         this.panelCreate(root1, Panels.RelayFeeChartPanel);
         this.panelCreate(root2, Panels.RelayTradesChartPanel);
         this.panelCreate(this.domAddPanelRow(), Panels.PriceChartPanel);
-	}
+    }
 
     public bindCallbacks(callbacks: ViewEvents) {
         this._callbacks = callbacks;
