@@ -634,6 +634,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://www.wolk.com",
     },
+    "0xac3211a5025414af2866ff09c23fc18bc97e79b1": {
+        "name": "DOVU",
+        "symbol": "DOV",
+        "decimals": 18,
+        "website": "https://dovu.io",
+    },
 };
 
 /* Populated by model */
