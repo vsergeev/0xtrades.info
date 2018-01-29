@@ -662,6 +662,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://icon.foundation",
     },
+    "0xeb2da9fac54284cea731d1f10bb34eecb3c00c14": {
+        "name": "POW Token",
+        "symbol": "POW",
+        "decimals": 18,
+        "website": "https://powtoken.com",
+    },
 };
 
 /* Populated by model */
