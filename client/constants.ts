@@ -604,6 +604,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 12,
         "website": "https://gridplus.io",
     },
+    "0xfec0cf7fe078a500abf15f1284958f22049c2c7e": {
+        "name": "Maecenas ART Token",
+        "symbol": "ART",
+        "decimals": 18,
+        "website": "https://www.maecenas.co",
+    },
 };
 
 /* Populated by model */
