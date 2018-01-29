@@ -622,6 +622,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://ethlend.io",
     },
+    "0xc438b4c0dfbb1593be6dee03bbd1a84bb3aa6213": {
+        "name": "Ethereum Qchain Token",
+        "symbol": "EQC",
+        "decimals": 8,
+        "website": "https://qchain.co",
+    },
 };
 
 /* Populated by model */
