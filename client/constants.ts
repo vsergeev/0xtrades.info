@@ -668,6 +668,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://powtoken.com",
     },
+    "0xba5f11b16b155792cf3b2e6880e8706859a8aeb6": {
+        "name": "Aeron",
+        "symbol": "ARN",
+        "decimals": 8,
+        "website": "https://aeron.aero",
+    },
 };
 
 /* Populated by model */
