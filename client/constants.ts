@@ -105,7 +105,7 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "website": "https://lunyr.com",
     },
     "0xc66ea802717bfb9833400264dd12c2bceaa34a6d": {
-        "name": "MakerDAO",
+        "name": "MakerDAO (Deprecated)",
         "symbol": "MKR",
         "decimals": 18,
         "website": "https://makerdao.com",
@@ -645,6 +645,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "symbol": "RHOC",
         "decimals": 8,
         "website": "https://www.rchain.coop",
+    },
+    "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2": {
+        "name": "MakerDAO",
+        "symbol": "MKR",
+        "decimals": 18,
+        "website": "https://makerdao.com",
     },
 };
 
