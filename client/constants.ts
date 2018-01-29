@@ -628,6 +628,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 8,
         "website": "https://qchain.co",
     },
+    "0xf6b55acbbc49f4524aa48d19281a9a77c54de10f": {
+        "name": "WOLK Token",
+        "symbol": "WLK",
+        "decimals": 18,
+        "website": "https://www.wolk.com",
+    },
 };
 
 /* Populated by model */
