@@ -652,6 +652,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://makerdao.com",
     },
+    "0xb5a5f22694352c15b00323844ad545abb2b11028": {
+        "name": "ICON",
+        "symbol": "ICX",
+        "decimals": 18,
+        "website": "https://icon.foundation",
+    },
 };
 
 /* Populated by model */
