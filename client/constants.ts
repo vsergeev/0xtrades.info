@@ -610,6 +610,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://www.maecenas.co",
     },
+    "0xbf2179859fc6d5bee9bf9158632dc51678a4100e": {
+        "name": "ELF Token",
+        "symbol": "ELF",
+        "decimals": 18,
+        "website": "https://aelf.io",
+    },
 };
 
 /* Populated by model */
