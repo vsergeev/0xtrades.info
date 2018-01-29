@@ -640,6 +640,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://dovu.io",
     },
+    "0x168296bb09e24a88805cb9c33356536b980d3fc5": {
+        "name": "RChain",
+        "symbol": "RHOC",
+        "decimals": 8,
+        "website": "https://www.rchain.coop",
+    },
 };
 
 /* Populated by model */
