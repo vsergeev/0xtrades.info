@@ -616,6 +616,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://aelf.io",
     },
+    "0x80fb784b7ed66730e8b1dbd9820afd29931aab03": {
+        "name": "EthLend Token",
+        "symbol": "LEND",
+        "decimals": 18,
+        "website": "https://ethlend.io",
+    },
 };
 
 /* Populated by model */
