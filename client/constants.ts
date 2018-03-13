@@ -59,6 +59,10 @@ export const ZEROEX_RELAY_ADDRESSES: { [networkId: number] : { [address: string]
             name: "DDEX",
             website: "https://ddex.io",
         },
+        "0x4969358e80cdc3d74477d7447bffa3b2e2acbe92": {
+            name: "Paradex",
+            website: "https://paradex.io",
+        },
     },
     42: {
         "0xa258b39954cef5cb142fd567a46cddb31a670124": {
