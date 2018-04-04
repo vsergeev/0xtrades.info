@@ -690,6 +690,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://novablitz.com",
     },
+    "0xb98d4c97425d9908e66e53a6fdf673acca0be986": {
+        "name": "ArcBlock",
+        "symbol": "ABT",
+        "decimals": 18,
+        "website": "https://www.arcblock.io",
+    },
 };
 
 /* Populated by model */
