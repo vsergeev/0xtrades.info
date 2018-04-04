@@ -678,6 +678,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 8,
         "website": "https://aeron.aero",
     },
+    "0x151202c9c18e495656f372281f493eb7698961d5": {
+        "name" : "Debitum",
+        "symbol": "DEB",
+        "decimals": 18,
+        "website": "https://debitum.network",
+    },
 };
 
 /* Populated by model */
