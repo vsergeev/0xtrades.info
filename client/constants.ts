@@ -684,6 +684,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://debitum.network",
     },
+    "0x09d8b66c48424324b25754a873e290cae5dca439": {
+        "name": "Nova Token",
+        "symbol": "NVT",
+        "decimals": 18,
+        "website": "https://novablitz.com",
+    },
 };
 
 /* Populated by model */
