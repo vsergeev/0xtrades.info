@@ -125,8 +125,8 @@ export class Model {
         /* Create our ZeroEx instance */
         this._zeroEx = new ZeroEx(this._web3Wrapper.getCurrentProvider(), {networkId: this._networkId});
 
-        /* Set global exchange address */
-        Constants.ZEROEX_EXCHANGE_ADDRESS! = this._zeroEx.exchange.getContractAddress();
+        /* Set global exchange address (FIXME read-only override) */
+        Constants!.ZEROEX_EXCHANGE_ADDRESS = this._zeroEx.exchange.getContractAddress();
 
         /* Determine block height */
         try {
@@ -148,8 +148,9 @@ export class Model {
             let tokens = await this._zeroEx.tokenRegistry.getTokensAsync();
 
             for (let token of tokens) {
+                /* Capture ZRX token address (FIXME read-only override) */
                 if (token.symbol === "ZRX")
-                    Constants.ZEROEX_TOKEN_ADDRESS! = token.address;
+                    Constants!.ZEROEX_TOKEN_ADDRESS = token.address;
 
                 if (!Constants.ZEROEX_TOKEN_INFOS[token.address]) {
                     Constants.ZEROEX_TOKEN_INFOS[token.address] = {
