@@ -113,7 +113,7 @@ export abstract class Panel {
     public abstract handleNewTrade(index: number, trade: Trade, tradeHistory: Trade[]): void;
 }
 
-export type PanelType = new (view: View.View) => Panel;
+export type PanelType = new (view: View.View, ...args: any[]) => Panel;
 
 /******************************************************************************/
 /* EmptyPanel */
