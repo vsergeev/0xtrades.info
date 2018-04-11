@@ -375,7 +375,7 @@ export class RecentTradesPanel extends Panel {
                      .append($('<td></td>')            /* Price */
                                .append(price))
                      .append($('<td></td>')            /* Relay */
-                               .append(this._view.formatRelayLink(trade.feeAddress)))
+                               .append(this._view.formatRelayLink(trade.relayAddress)))
                      .append($('<td></td>')            /* Maker Fee */
                                .addClass('overflow-sm')
                                .text(trade.makerFee.toDigits(6) + " ZRX"))
