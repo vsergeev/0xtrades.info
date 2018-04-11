@@ -48,6 +48,7 @@ export interface Trade {
     tmPrice: BigNumber | null;
     makerNormalized: boolean;
     takerNormalized: boolean;
+    relayAddress: string;
 }
 
 export interface Statistics {
