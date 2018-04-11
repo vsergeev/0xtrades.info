@@ -374,8 +374,8 @@ export class RecentTradesPanel extends Panel {
                                .append(swap))
                      .append($('<td></td>')            /* Price */
                                .append(price))
-                     .append($('<td></td>')            /* Relay Address */
-                               .append(this._view.formatRelayLink(trade.relayAddress)))
+                     .append($('<td></td>')            /* Relay */
+                               .append(this._view.formatRelayLink(trade.feeAddress)))
                      .append($('<td></td>')            /* Maker Fee */
                                .addClass('overflow-sm')
                                .text(trade.makerFee.toDigits(6) + " ZRX"))
@@ -425,7 +425,7 @@ export class RecentTradesPanel extends Panel {
                         <tr><th>Timestamp</th><td></td></tr>
                         <tr><th>Maker Address</th><td></td></tr>
                         <tr><th>Taker Address</th><td></td></tr>
-                        <tr><th>Relay Address</th><td></td></tr>
+                        <tr><th>Fee Address</th><td></td></tr>
                         <tr><th>Maker Amount</th><td></td></tr>
                         <tr><th>Taker Amount</th><td></td></tr>
                         <tr><th>Maker Fee</th><td></td></tr>
@@ -449,11 +449,11 @@ export class RecentTradesPanel extends Panel {
             /* Taker Address */
             table.find('td').eq(4).append(this._view.formatAddressLink(trade.takerAddress, trade.takerAddress));
             /* Relay Address */
-            table.find('td').eq(5).append(this._view.formatAddressLink(trade.relayAddress, trade.relayAddress));
-            if (this._view.isRelayAddress(trade.relayAddress)) {
+            table.find('td').eq(5).append(this._view.formatAddressLink(trade.feeAddress, trade.feeAddress));
+            if (this._view.isRelayAddress(trade.feeAddress)) {
                 table.find('td').eq(5).append($("<span></span>")
                                                 .append(" (")
-                                                .append(this._view.formatRelayLink(trade.relayAddress))
+                                                .append(this._view.formatRelayLink(trade.feeAddress))
                                                 .append(")"));
             }
             /* Maker Volume/Token */

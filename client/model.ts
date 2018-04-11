@@ -214,7 +214,7 @@ export class Model {
         trade.blockNumber = log.log.blockNumber!;
         trade.takerAddress = log.log.args.taker;
         trade.makerAddress = log.log.args.maker;
-        trade.relayAddress = log.log.args.feeRecipient;
+        trade.feeAddress = log.log.args.feeRecipient;
         trade.takerToken = log.log.args.takerToken;
         trade.makerToken = log.log.args.makerToken;
         trade.makerVolume = log.log.args.filledMakerTokenAmount;
@@ -368,7 +368,7 @@ export class Model {
 
             /*** Relay fee statistics ***/
 
-            let relayAddress = trade.relayAddress;
+            let relayAddress = trade.feeAddress;
             let relayFee = trade.makerFee.add(trade.takerFee);
 
             if (statistics.fees.relays[relayAddress] === undefined)

@@ -36,7 +36,7 @@ export interface Trade {
     timestamp: number;
     takerAddress: string;
     makerAddress: string;
-    relayAddress: string;
+    feeAddress: string;
     takerToken: string;
     makerToken: string;
     makerVolume: BigNumber;
