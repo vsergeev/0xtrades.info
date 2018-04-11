@@ -708,6 +708,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 10,
         "website": "https://elemco.in",
     },
+    "0x23352036e911a22cfc692b5e2e196692658aded9": {
+        "name": "Friendz Coin",
+        "symbol": "FDZ",
+        "decimals": 18,
+        "website": "https://friendz.io",
+    },
 };
 
 /* Populated by model */
