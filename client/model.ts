@@ -226,7 +226,19 @@ export class Model {
         trade.tmPrice = null;
         trade.makerNormalized = false;
         trade.takerNormalized = false;
-        trade.relayAddress = trade.feeAddress;
+
+        /* Look up relay */
+        if (Constants.ZEROEX_RELAY_ADDRESSES[this._networkId][trade.feeAddress]) {
+            trade.relayAddress = trade.feeAddress;
+        } else if (!(new BigNumber(trade.feeAddress, 16)).eq(0)) {
+            trade.relayAddress = trade.feeAddress;
+        } else if (Constants.ZEROEX_RELAY_ADDRESSES[this._networkId][trade.takerAddress]) {
+            trade.relayAddress = trade.takerAddress;
+        } else if (Constants.ZEROEX_RELAY_ADDRESSES[this._networkId][trade.makerAddress]) {
+            trade.relayAddress = trade.makerAddress;
+        } else {
+            trade.relayAddress = trade.feeAddress;
+        }
 
         /* Normalize traded volume and fee quantities */
         [trade.makerVolume, trade.makerNormalized] = this._normalizeQuantity(trade.makerToken, trade.makerVolume);
