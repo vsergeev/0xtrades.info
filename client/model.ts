@@ -226,6 +226,7 @@ export class Model {
         trade.tmPrice = null;
         trade.makerNormalized = false;
         trade.takerNormalized = false;
+        trade.relayAddress = trade.feeAddress;
 
         /* Normalize traded volume and fee quantities */
         [trade.makerVolume, trade.makerNormalized] = this._normalizeQuantity(trade.makerToken, trade.makerVolume);
@@ -368,7 +369,7 @@ export class Model {
 
             /*** Relay fee statistics ***/
 
-            let relayAddress = trade.feeAddress;
+            let relayAddress = trade.relayAddress;
             let relayFee = trade.makerFee.add(trade.takerFee);
 
             if (statistics.fees.relays[relayAddress] === undefined)
