@@ -340,10 +340,6 @@ export class View {
         }
     }
 
-    public isRelayAddress(address: string): boolean {
-        return Constants.ZEROEX_RELAY_ADDRESSES[this._networkId][address] != undefined;
-    }
-
     public formatRelayLink(address: string, digits?: number): JQuery<HTMLElement> | string {
         if (Constants.ZEROEX_RELAY_ADDRESSES[this._networkId][address]) {
             let elem = $('<a></a>')

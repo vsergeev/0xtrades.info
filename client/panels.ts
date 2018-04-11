@@ -426,6 +426,7 @@ export class RecentTradesPanel extends Panel {
                         <tr><th>Maker Address</th><td></td></tr>
                         <tr><th>Taker Address</th><td></td></tr>
                         <tr><th>Fee Address</th><td></td></tr>
+                        <tr><th>Relay</th><td></td></tr>
                         <tr><th>Maker Amount</th><td></td></tr>
                         <tr><th>Taker Amount</th><td></td></tr>
                         <tr><th>Maker Fee</th><td></td></tr>
@@ -450,28 +451,24 @@ export class RecentTradesPanel extends Panel {
             table.find('td').eq(4).append(this._view.formatAddressLink(trade.takerAddress, trade.takerAddress));
             /* Fee Address */
             table.find('td').eq(5).append(this._view.formatAddressLink(trade.feeAddress, trade.feeAddress));
-            if (this._view.isRelayAddress(trade.feeAddress)) {
-                table.find('td').eq(5).append($("<span></span>")
-                                                .append(" (")
-                                                .append(this._view.formatRelayLink(trade.feeAddress))
-                                                .append(")"));
-            }
+            /* Relay */
+            table.find('td').eq(6).append(this._view.formatRelayLink(trade.relayAddress));
             /* Maker Volume/Token */
-            table.find('td').eq(6).append($("<span></span>")
+            table.find('td').eq(7).append($("<span></span>")
                                             .append($(trade.makerNormalized ? "<span></span>" : "<i></i>")
                                                       .text(trade.makerVolume + " "))
                                             .append(this._view.formatTokenLink(trade.makerToken, 64)));
             /* Taker Volume/Token */
-            table.find('td').eq(7).append($("<span></span>")
+            table.find('td').eq(8).append($("<span></span>")
                                             .append($(trade.takerNormalized ? "<span></span>" : "<i></i>")
                                                       .text(trade.takerVolume + " "))
                                             .append(this._view.formatTokenLink(trade.takerToken, 64)));
             /* Maker Fee */
-            table.find('td').eq(8).text(trade.makerFee + " ZRX");
+            table.find('td').eq(9).text(trade.makerFee + " ZRX");
             /* Taker Fee */
-            table.find('td').eq(9).text(trade.takerFee + " ZRX");
+            table.find('td').eq(10).text(trade.takerFee + " ZRX");
             /* Order Hash */
-            table.find('td').eq(12).text(trade.orderHash);
+            table.find('td').eq(13).text(trade.orderHash);
 
             /* Fetch the order information */
             this.fetchOrder(table, trade);
@@ -497,14 +494,14 @@ export class RecentTradesPanel extends Panel {
             let gasUsed = orderInfo.transaction.gas.toString();
             let gasPrice = this._view.formatWei(orderInfo.transaction.gasPrice, 'gwei').toString();
             let gasEth = this._view.formatWei(orderInfo.transaction.gasPrice.mul(orderInfo.transaction.gas), 'ether').toString();
-            dom.find('td').eq(10).text(gasUsed);
-            dom.find('td').eq(11).text(gasEth + " ETH");
+            dom.find('td').eq(11).text(gasUsed);
+            dom.find('td').eq(12).text(gasEth + " ETH");
         }
 
         /* Render an error */
         if (orderInfo.error) {
             let elem = $('<b></b>').addClass('text-danger').text("Error: " + orderInfo.error);
-            dom.find('td').eq(13).append(elem);
+            dom.find('td').eq(14).append(elem);
             return;
         }
 
@@ -547,7 +544,7 @@ export class RecentTradesPanel extends Panel {
                                 .toggleClass('disabled', orderInfo.takerAmountRemaining!.eq(0) || orderInfo.isExpired!)
                                 .text('Fill Order')));
 
-        dom.find('td').eq(13).append(elem);
+        dom.find('td').eq(14).append(elem);
     }
 
     private _handlePriceInvert() {
