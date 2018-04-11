@@ -227,7 +227,7 @@ export class Model {
         trade.makerNormalized = false;
         trade.takerNormalized = false;
 
-        /* Normalize traded volueme and fee quantities */
+        /* Normalize traded volume and fee quantities */
         [trade.makerVolume, trade.makerNormalized] = this._normalizeQuantity(trade.makerToken, trade.makerVolume);
         [trade.takerVolume, trade.takerNormalized] = this._normalizeQuantity(trade.takerToken, trade.takerVolume);
         [trade.makerFee, ] = this._normalizeQuantity(Constants.ZEROEX_TOKEN_ADDRESS, trade.makerFee);
