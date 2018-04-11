@@ -732,6 +732,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 6,
         "website": "https://www.qubitica.net/",
     },
+    "0x9992ec3cf6a55b00978cddf2b27bc6882d88d1ec": {
+        "name": "Polymath",
+        "symbol": "POLY",
+        "decimals": 18,
+        "website": "https://www.polymath.network/",
+    },
 };
 
 /* Populated by model */
