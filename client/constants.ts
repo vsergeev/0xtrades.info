@@ -714,6 +714,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://friendz.io",
     },
+    "0x12b306fa98f4cbb8d4457fdff3a0a0a56f07ccdf": {
+        "name": "Spectre.ai D-Token",
+        "symbol": "SXDT",
+        "decimals": 18,
+        "website": "https://spectre.ai",
+    },
 };
 
 /* Populated by model */
