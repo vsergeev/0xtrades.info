@@ -702,6 +702,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 8,
         "website": "https://www.kickico.com",
     },
+    "0xada00d9468c54a17564e33058bdd9451f75462ad": {
+        "name": "Elemental",
+        "symbol": "ELEM",
+        "decimals": 10,
+        "website": "https://elemco.in",
+    },
 };
 
 /* Populated by model */
