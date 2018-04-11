@@ -726,6 +726,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://sharpe.capital",
     },
+    "0xcb5ea3c190d8f82deadf7ce5af855ddbf33e3962": {
+        "name": "Qubitica",
+        "symbol": "QBIT",
+        "decimals": 6,
+        "website": "https://www.qubitica.net/",
+    },
 };
 
 /* Populated by model */
