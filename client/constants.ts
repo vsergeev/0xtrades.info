@@ -696,6 +696,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://www.arcblock.io",
     },
+    "0x27695e09149adc738a978e9a678f99e4c39e9eb9": {
+        "name": "KickCoin",
+        "symbol": "KICK",
+        "decimals": 8,
+        "website": "https://www.kickico.com",
+    },
 };
 
 /* Populated by model */
