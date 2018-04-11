@@ -352,10 +352,10 @@ export class View {
                                  .text(Constants.ZEROEX_RELAY_ADDRESSES[this._networkId][address].name);
 
             return elem;
-        } else if ((new BigNumber(address, 16)).eq(0)) {
-            return $("<span></span>").text("None");
-        } else {
+        } else if (!(new BigNumber(address, 16)).eq(0)) {
             return this.formatTokenAddressLink(Constants.ZEROEX_TOKEN_ADDRESS, address, this.formatHex(address, digits));
+        } else {
+            return $("<span></span>").text("None");
         }
     }
 

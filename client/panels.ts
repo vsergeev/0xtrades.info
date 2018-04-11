@@ -448,7 +448,7 @@ export class RecentTradesPanel extends Panel {
             table.find('td').eq(3).append(this._view.formatAddressLink(trade.makerAddress, trade.makerAddress));
             /* Taker Address */
             table.find('td').eq(4).append(this._view.formatAddressLink(trade.takerAddress, trade.takerAddress));
-            /* Relay Address */
+            /* Fee Address */
             table.find('td').eq(5).append(this._view.formatAddressLink(trade.feeAddress, trade.feeAddress));
             if (this._view.isRelayAddress(trade.feeAddress)) {
                 table.find('td').eq(5).append($("<span></span>")
