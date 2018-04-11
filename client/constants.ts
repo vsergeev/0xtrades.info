@@ -738,6 +738,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://www.polymath.network/",
     },
+    "0x9e46a38f5daabe8683e10793b06749eef7d733d1": {
+        "name": "Nectar",
+        "symbol": "NCT",
+        "decimals": 18,
+        "website": "https://polyswarm.io",
+    },
 };
 
 /* Populated by model */
