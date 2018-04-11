@@ -720,6 +720,12 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://spectre.ai",
     },
+    "0xef2463099360a085f1f10b076ed72ef625497a06": {
+        "name": "Sharpe Platform Token",
+        "symbol": "SHP",
+        "decimals": 18,
+        "website": "https://sharpe.capital",
+    },
 };
 
 /* Populated by model */
