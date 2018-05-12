@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
-  entry: './client/app.ts',
+  entry: './src/app.ts',
   devtool: 'inline-source-map',
   module: {
     rules: [
@@ -17,7 +17,7 @@ module.exports = {
     extensions: [ '.tsx', '.ts', '.js' ]
   },
   output: {
-    filename: './docs/js/bundle.js',
+    filename: '../docs/js/bundle.js',
   },
   plugins: [
     new webpack.ProvidePlugin({

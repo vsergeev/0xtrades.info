@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "./docs/js",
+        "outDir": "../docs/js",
         "module": "commonjs",
         "target": "es5",
         "lib": [ "es2017", "dom" ],
@@ -9,8 +9,8 @@
         "strictPropertyInitialization": false
     },
     "include": [
-        "./client/*",
-        "./client/web3-provider-engine.d.ts",
+        "./src/*",
+        "./src/web3-provider-engine.d.ts",
         "./node_modules/web3-typescript-typings/index.d.ts"
     ]
 }

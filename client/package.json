@@ -28,6 +28,8 @@
   },
   "devDependencies": {},
   "scripts": {
+    "build": "webpack",
+    "serve": "browser-sync start -s ../docs -f ../docs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
