@@ -102,7 +102,7 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://weth.io",
     },
-    "0xe94327d07fc17907b4db788e5adf2ed424addff6": {
+    "0x949bed886c739f1a3273629b3320db0c5024c719": {
         "name": "AMIS",
         "symbol": "AMIS",
         "decimals": 9,
