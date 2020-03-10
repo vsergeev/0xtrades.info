@@ -1,3 +1,5 @@
+# Note: this project is no longer maintained.
+
 # 0xtrades.info [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/vsergeev/0xtrades.info/blob/master/LICENSE)
 
 A real-time trade viewer for the [0x protocol](href="https://0xproject.com/").
