@@ -63,6 +63,14 @@ export const ZEROEX_RELAY_ADDRESSES: { [networkId: number] : { [address: string]
             name: "Paradex",
             website: "https://paradex.io",
         },
+        "0x5dd835a893734b8d556eccf87800b76dda5aedc5": {
+            name: "Bamboo relay",
+            website: "https://bamboorelay.com",
+        },
+        "0x5e150a33ffa97a8d22f59c77ae5487b089ef62e9": {
+            name: "Token jar",
+            website: "https://tokenjar.io",
+        },
     },
     42: {
         "0xa258b39954cef5cb142fd567a46cddb31a670124": {
@@ -94,7 +102,13 @@ export let ZEROEX_TOKEN_INFOS: { [address: string]: TokenInfo } = {
         "decimals": 18,
         "website": "https://weth.io",
     },
-    "0xe94327d07fc17907b4db788e5adf2ed424addff6": {
+    "0x949bed886c739f1a3273629b3320db0c5024c719": {
+        "name": "AMIS",
+        "symbol": "AMIS",
+        "decimals": 9,
+        "website": "https://erc20amis.wordpress.com",
+        
+    },"0xe94327d07fc17907b4db788e5adf2ed424addff6": {
         "name": "Augur Reputation Token",
         "symbol": "REP",
         "decimals": 18,
